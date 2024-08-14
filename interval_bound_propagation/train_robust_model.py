@@ -29,11 +29,13 @@ parser.add_argument('--ep_i', default=2/255, type=float, help='epsilon_input')
 parser.add_argument('--ep_w', default=2/255, type=float, help='epsilon_weight')
 parser.add_argument('--ep_b', default=2/255, type=float, help='epsilon_bias')
 parser.add_argument('--ep_a', default=2/255, type=float, help='epsilon_activation')
+parser.add_argument('--k', default=0.5, type=float, help='kappa')
 parser.add_argument('--resume', '-r', action='store_true', help='resume from checkpoint')
 args = parser.parse_args()
 
 #print(torch.cuda.is_available())
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+print('Using device: ', device)
 best_acc = 0  # best test accuracy
 nor_acc = 0
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
@@ -43,6 +45,11 @@ k_list = []
 eps_list = []
 loss_train_list = []
 loss_val_list = []
+
+loss_train_non_robust = []
+loss_train_robust = []
+loss_val_non_robust = []
+loss_val_robust = []
 
 # Data
 #print('==> Preparing data..')
@@ -57,10 +64,10 @@ transform_test = transforms.Compose([
     transforms.Normalize((0.1307,), (0.3081,)),
 ])
 
-trainset = torchvision.datasets.MNIST(root='\datasets', train=True, download=True, transform=transform_train)
+trainset = torchvision.datasets.MNIST(root='datasets', train=True, download=True, transform=transform_train)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=100, shuffle=False, num_workers=2)
 
-testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
+testset = torchvision.datasets.MNIST(root='datasets', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
 
 classes = ('0','1','2','3','4','5','6','7','8','9')
@@ -98,7 +105,8 @@ ep_i = args.ep_i
 ep_w = args.ep_w
 ep_b = args.ep_b
 ep_a = args.ep_a
-kappa_schedule = generate_kappa_schedule_MNIST()
+k = args.k
+kappa_schedule = generate_kappa_schedule_MNIST(k)
 ep_i_schedule = generate_epsilon_schedule_MNIST(ep_i)
 ep_w_schedule = generate_epsilon_schedule_MNIST(ep_w)
 ep_b_schedule = generate_epsilon_schedule_MNIST(ep_b)
@@ -123,8 +131,11 @@ def train(epoch, batch_counter):
     global eps_list 
     global loss_train_list
     global loss_val_list
-
-                                                                                                                                                                                                                                                                                                                                               
+    global loss_train_non_robust
+    global loss_train_robust
+    global loss_val_non_robust
+    global loss_val_robust
+                                                                                                                                                                                                                                                                                                                                   
     lr =args.lr
     if epoch>50:
         lr/=10
@@ -169,17 +180,20 @@ def train(epoch, batch_counter):
         _, loss_train = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
         acc_nor, loss_val = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
         acc_rob = acc_nor
+
     if batch_counter >= 2400 and batch_counter < 14400: 
         print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
         _, loss_train = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = ep_i_schedule[batch_counter], 
                                                                         ep_w=ep_w_schedule[batch_counter],
                                                                         ep_b=ep_b_schedule[batch_counter],
                                                                         ep_a=ep_a_schedule[batch_counter])
+        
         acc_nor,_ = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
         acc_rob, loss_val = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = ep_i_schedule[batch_counter], 
                                                                         ep_w=ep_w_schedule[batch_counter],
                                                                         ep_b=ep_b_schedule[batch_counter],
                                                                         ep_a=ep_a_schedule[batch_counter])
+
     if batch_counter >= 14400:
         #     print_accuracy(net, trainloader, testloader, device, test=True, eps = 2/255)
         print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
@@ -187,6 +201,7 @@ def train(epoch, batch_counter):
                                                                          ep_w=ep_w_schedule[batch_counter],
                                                                          ep_b=ep_b_schedule[batch_counter],
                                                                          ep_a=ep_a_schedule[batch_counter])
+        
         acc_nor,_ = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
         acc_rob, loss_val = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = ep_i_schedule[batch_counter], 
                                                                                   ep_w=ep_w_schedule[batch_counter],
@@ -209,6 +224,25 @@ def train(epoch, batch_counter):
             print("best_acc: ", best_acc)
             nor_acc = acc_nor
             print("nor_acc: ", nor_acc)
+
+    # Non Robust and Robust loss
+    _, l = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
+    loss_train_non_robust.append(l)
+    _, l = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = args.ep_i, 
+                                                                    ep_w=args.ep_w,
+                                                                    ep_b=args.ep_b,
+                                                                    ep_a=args.ep_a)
+    loss_train_robust.append(l)
+    
+    _, l = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
+    loss_val_non_robust.append(l)
+    _, l = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = args.ep_i, 
+                                                                                ep_w=args.ep_w,
+                                                                                ep_b=args.ep_b,
+                                                                                ep_a=args.ep_a)
+    loss_val_robust.append(l)
+    
+    # Log
     acc_nor_list.append(acc_nor)
     acc_rob_list.append(acc_rob)
     loss_train_list.append(loss_train)
@@ -231,8 +265,10 @@ if __name__=="__main__":
     
 
 
-    result = {'acc_rob': acc_rob_list, 'acc_nor': acc_nor_list, 'loss_train': loss_train_list, 'loss_val': loss_val_list}
-    path = 'results/training_phase/epsilon_strategy/running_eps_2_255.xlsx'
+    result = {'acc_rob': acc_rob_list, 'acc_nor': acc_nor_list, 'loss_train': loss_train_list, 'loss_val': loss_val_list,
+                'loss_train_robust': loss_train_robust, 'loss_train_non_robust': loss_train_non_robust, 
+                'loss_val_robust': loss_val_robust, 'loss_val_non_robust': loss_val_non_robust}
+    path = f'results/training_phase/kappa_strategy/running_eps_{ep_w}_k_{k}.xlsx'
     DictExcelSaver.save(result,path)
 
     

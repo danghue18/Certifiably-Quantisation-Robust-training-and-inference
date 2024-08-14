@@ -10,7 +10,7 @@ TOTAL_BAR_LENGTH = 65.
 last_time = time.time()
 begin_time = last_time
 
-def generate_kappa_schedule_MNIST():
+def generate_kappa_schedule_MNIST(k=0.5):
 
     # kappa_schedule = 2400*[1] # warm-up phase
     # kappa_value = 1.0
@@ -24,7 +24,7 @@ def generate_kappa_schedule_MNIST():
     #     kappa_schedule.append(0.5)
     kappa_schedule = 2400*[1] # warm-up phase
     for i in range(57600+60000):
-        kappa_schedule.append(0.5)
+        kappa_schedule.append(k)
     return kappa_schedule
 
 def generate_epsilon_schedule_MNIST(epsilon_train):
