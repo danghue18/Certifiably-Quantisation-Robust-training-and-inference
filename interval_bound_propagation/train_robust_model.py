@@ -25,10 +25,10 @@ from multiprocessing import freeze_support
 
 parser = argparse.ArgumentParser(description='PyTorch MNIST Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
-parser.add_argument('--ep_i', default=2/255, type=float, help='epsilon_input')
-parser.add_argument('--ep_w', default=2/255, type=float, help='epsilon_weight')
-parser.add_argument('--ep_b', default=2/255, type=float, help='epsilon_bias')
-parser.add_argument('--ep_a', default=2/255, type=float, help='epsilon_activation')
+parser.add_argument('--ep_i', default=1/255, type=float, help='epsilon_input')
+parser.add_argument('--ep_w', default=1/255, type=float, help='epsilon_weight')
+parser.add_argument('--ep_b', default=1/255, type=float, help='epsilon_bias')
+parser.add_argument('--ep_a', default=1/255, type=float, help='epsilon_activation')
 parser.add_argument('--resume', '-r', action='store_true', help='resume from checkpoint')
 args = parser.parse_args()
 
@@ -75,9 +75,6 @@ net =  MNIST_MLP(
     # norm = [True, True, True])
     # non_negative = [True, True, True], 
     # norm = [False, False, False])
-net = net.to(device)
-
-
 net = net.to(device)
 if device == 'cuda':
     net = torch.nn.DataParallel(net)
@@ -165,50 +162,50 @@ def train(epoch, batch_counter):
 
     #print('Loss in training: %.3f' % (train_loss / 600))
     net.eval()
-    if batch_counter < 2400: 
-        _, loss_train = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
-        acc_nor, loss_val = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
-        acc_rob = acc_nor
-    if batch_counter >= 2400 and batch_counter < 14400: 
-        print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
-        _, loss_train = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = ep_i_schedule[batch_counter], 
-                                                                        ep_w=ep_w_schedule[batch_counter],
-                                                                        ep_b=ep_b_schedule[batch_counter],
-                                                                        ep_a=ep_a_schedule[batch_counter])
-        acc_nor,_ = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
-        acc_rob, loss_val = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = ep_i_schedule[batch_counter], 
-                                                                        ep_w=ep_w_schedule[batch_counter],
-                                                                        ep_b=ep_b_schedule[batch_counter],
-                                                                        ep_a=ep_a_schedule[batch_counter])
-    if batch_counter >= 14400:
+    # if batch_counter <= 2400: 
+    #     _, loss_train = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
+    #     acc_nor, loss_val = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
+    #     acc_rob = acc_nor
+    # if batch_counter >= 2400 and batch_counter < 26400: 
+    #     print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
+    #     _, loss_train = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = ep_i, 
+    #                                                                     ep_w=ep_w,
+    #                                                                     ep_b=ep_b,
+    #                                                                     ep_a=ep_a)
+    #     acc_nor,_ = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
+    #     acc_rob, loss_val = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = ep_i, 
+    #                                                                     ep_w=ep_w,
+    #                                                                     ep_b=ep_b,
+    #                                                                     ep_a=ep_a)
+    #if batch_counter > 2400:
         #     print_accuracy(net, trainloader, testloader, device, test=True, eps = 2/255)
-        print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
-        _, loss_train = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = ep_i_schedule[batch_counter], 
-                                                                         ep_w=ep_w_schedule[batch_counter],
-                                                                         ep_b=ep_b_schedule[batch_counter],
-                                                                         ep_a=ep_a_schedule[batch_counter])
-        acc_nor,_ = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
-        acc_rob, loss_val = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = ep_i_schedule[batch_counter], 
-                                                                                  ep_w=ep_w_schedule[batch_counter],
-                                                                                  ep_b=ep_b_schedule[batch_counter],
-                                                                                  ep_a=ep_a_schedule[batch_counter])
+    print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
+    _, loss_train = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = ep_i, 
+                                                                        ep_w=ep_w,
+                                                                        ep_b=ep_b,
+                                                                        ep_a=ep_a)
+    acc_nor,_ = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
+    acc_rob, loss_val = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = ep_i, 
+                                                                                ep_w=ep_w,
+                                                                                ep_b=ep_b,
+                                                                                ep_a=ep_a)
 
 
-        if acc_rob > best_acc:
-            print('Saving..')
-            state = {
-                'net': net.state_dict(),
-                'acc_nor': acc_nor,
-                'acc_rob': acc_rob,
-                'epoch': epoch,
-            }
-            if not os.path.isdir('checkpoint/test_k'):
-                os.mkdir('checkpoint/test_k')
-            torch.save(state, './checkpoint/test_k/ckpt.pth')
-            best_acc = acc_rob
-            print("best_acc: ", best_acc)
-            nor_acc = acc_nor
-            print("nor_acc: ", nor_acc)
+    if acc_rob > best_acc:
+        print('Saving..')
+        state = {
+            'net': net.state_dict(),
+            'acc_nor': acc_nor,
+            'acc_rob': acc_rob,
+            'epoch': epoch,
+        }
+        if not os.path.isdir('checkpoint/test_eps_k_running'):
+            os.mkdir('checkpoint/test_eps_k_0.5')
+        torch.save(state, './checkpoint/test_eps_k_0.5/running_eps_1_255.pth')
+        best_acc = acc_rob
+        print("best_acc: ", best_acc)
+        nor_acc = acc_nor
+        print("nor_acc: ", nor_acc)
     acc_nor_list.append(acc_nor)
     acc_rob_list.append(acc_rob)
     loss_train_list.append(loss_train)
@@ -216,13 +213,13 @@ def train(epoch, batch_counter):
 
     epoch+= 1
     #print('batch_counter after 1 epoch: ', batch_counter)
-    k_list.append(kappa_schedule[batch_counter])
-    eps_list.append(ep_i_schedule[batch_counter])
+    # k_list.append(kappa_schedule[batch_counter])
+    # eps_list.append(ep_i_schedule[batch_counter])
 
 if __name__=="__main__":
     freeze_support()  # This is necessary for Windows when using multiprocessing
     batch_counter = 0
-    for epoch in range(start_epoch, start_epoch+198):
+    for epoch in range(start_epoch, start_epoch+124):
         train(epoch, batch_counter)
         batch_counter+=600
   
@@ -232,7 +229,7 @@ if __name__=="__main__":
 
 
     result = {'acc_rob': acc_rob_list, 'acc_nor': acc_nor_list, 'loss_train': loss_train_list, 'loss_val': loss_val_list}
-    path = 'results/training_phase/epsilon_strategy/running_eps_2_255.xlsx'
+    path = 'results/training_phase/epsilon_strategy/running_eps_1_255_k_0.5.xlsx'
     DictExcelSaver.save(result,path)
 
     

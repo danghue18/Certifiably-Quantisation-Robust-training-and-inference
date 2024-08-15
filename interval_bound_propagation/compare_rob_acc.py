@@ -17,6 +17,7 @@ from utils import progress_bar
 from utils import generate_kappa_schedule_MNIST
 from utils import generate_epsilon_schedule_MNIST
 from compute_acc import *
+from utils import DictExcelSaver
 
 from multiprocessing import freeze_support
 
@@ -67,28 +68,35 @@ net =  MNIST_MLP(
     # non_negative = [True, True, True], 
     # norm = [False, False, False])
 net = net.to(device)
+if device == 'cuda':
+    net = torch.nn.DataParallel(net)
+    cudnn.benchmark = True
 
 def main():
 # Load checkpoint.
-    print('==> evaluate robust model.')
-    assert os.path.isdir('checkpoint'), 'Error: no checkpoint directory found!'
-    checkpoint = torch.load('./checkpoint/ckpt.pth')
-    net.load_state_dict(checkpoint['net'])
-    print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 2/255, 
-                                                                            ep_w = 2/255,
-                                                                            ep_b = 2/255,
-                                                                            ep_a = 2/255)
+    # print('==> evaluate robust model.')
+    # assert os.path.isdir('checkpoint'), 'Error: no checkpoint directory found!'
+    # checkpoint = torch.load('./checkpoint/test_eps_k_0.5/running_eps_2_255.pth')
+    # net.load_state_dict(checkpoint['net'])
+    # print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 2/255, 
+    #                                                                         ep_w = 2/255,
+    #                                                                         ep_b = 2/255,
+    #                                                                         ep_a = 2/255)
 
-    print_accuracy(net, trainloader, testloader, device, test=True)
-
+    # print_accuracy(net, trainloader, testloader, device, test=True)
+    acc_rob_list = []
     print('Evaluate normal model: ')
     checkpoint_nor = torch.load('./checkpoint/normal/ckpt.pth')
     net.load_state_dict(checkpoint_nor['net'])
-
-    print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 2/255, 
-                                                                              ep_w = 2/255,
-                                                                              ep_b = 2/255,
-                                                                              ep_a = 2/255)
-    print_accuracy(net, trainloader, testloader, device, test=True)
+    eps_list = [0, 1/255, 2/255, 4/255, 8/255]
+    for eps in eps_list: 
+        acc_rob, _ = print_accuracy(net, trainloader, testloader, device, test=True, ep_i =eps, 
+                                                                                ep_w = eps,
+                                                                                ep_b = eps,
+                                                                                ep_a = eps)
+        acc_rob_list.append(acc_rob)
+    result = {'acc_rob': acc_rob_list}
+    path = 'results/training_phase/rob_acc_nor_model.xlsx'
+    DictExcelSaver.save(result,path)
 if __name__=="__main__":
     main()
