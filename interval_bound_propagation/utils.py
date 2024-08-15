@@ -12,9 +12,9 @@ begin_time = last_time
 
 def generate_kappa_schedule_MNIST(k=0.5):
 
-    # kappa_schedule = 2400*[1] # warm-up phase
-    # kappa_value = 1.0
-    # step = 0.5/57600
+    kappa_schedule = 2400*[1] # warm-up phase
+    kappa_value = 1.0
+    step = 0.5/57600
     
     # for i in range(57600):
     #     kappa_value = kappa_value - step
@@ -22,7 +22,7 @@ def generate_kappa_schedule_MNIST(k=0.5):
 
     # for i in range(60000):
     #     kappa_schedule.append(0.5)
-    kappa_schedule = 2400*[1] # warm-up phase
+
     for i in range(57600+60000):
         kappa_schedule.append(k)
     return kappa_schedule
@@ -31,14 +31,14 @@ def generate_epsilon_schedule_MNIST(epsilon_train):
     
     epsilon_schedule = 2400*[0]
     step = epsilon_train/12000
-    
     for i in range(12000):
-        epsilon_schedule.append(i*step) #ramp-up phase
+        epsilon_schedule.append(i*step) #warm-up phase
     
     for i in range(45600+60000):
         epsilon_schedule.append(epsilon_train)
-        
-    return epsilon_schedule
+    # for i in range(57600+60000):
+    #     epsilon_schedule.append(epsilon_train)
+    # return epsilon_schedule
 
 
 def get_terminal_size():
