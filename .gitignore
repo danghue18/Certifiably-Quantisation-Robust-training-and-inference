@@ -2,3 +2,5 @@ checkpoint/*
 datasets/*
 extracted_params/*
 interval_bound_propagation/datasets/*
+interval_bound_propagation/results/training_phase/kappa_strategy/*
+interval_bound_propagation/checkpoint/test_k/*.pth

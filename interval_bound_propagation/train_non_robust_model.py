@@ -159,7 +159,7 @@ def train(epoch):
 if __name__=="__main__":
     freeze_support()  # This is necessary for Windows when using multiprocessing
     batch_counter = 0
-    for epoch in range(start_epoch, start_epoch+199):
+    for epoch in range(start_epoch, start_epoch+125):
         train(epoch, batch_counter)
         batch_counter+=600
   
