@@ -6,9 +6,7 @@ interval_bound_propagation/results/training_phase/*
 #interval_bound_propagation/checkpoint/test_k/*.pth
 verification/datasets/*
 quantization/datasets/cifar-10-batches-py/*
-quantization/datasets/FashionMNIST/*
-quantization/datasets/test_32x32.mat
-quantization/datasets/train_32x32.mat
+ quantization/datasets/*
 
 
 
