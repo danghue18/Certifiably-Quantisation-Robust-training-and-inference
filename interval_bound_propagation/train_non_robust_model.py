@@ -23,10 +23,10 @@ from multiprocessing import freeze_support
 
 parser = argparse.ArgumentParser(description='PyTorch MNIST Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
-parser.add_argument('--ep_i', default=2/255, type=float, help='epsilon_input')
-parser.add_argument('--ep_w', default=2/255, type=float, help='epsilon_weight')
-parser.add_argument('--ep_b', default=2/255, type=float, help='epsilon_bias')
-parser.add_argument('--ep_a', default=2/255, type=float, help='epsilon_activation')
+parser.add_argument('--ep_i', default=1/255, type=float, help='epsilon_input')
+parser.add_argument('--ep_w', default=1/255, type=float, help='epsilon_weight')
+parser.add_argument('--ep_b', default=1/255, type=float, help='epsilon_bias')
+parser.add_argument('--ep_a', default=1/255, type=float, help='epsilon_activation')
 parser.add_argument('--resume', '-r', action='store_true', help='resume from checkpoint')
 args = parser.parse_args()
 
@@ -38,30 +38,35 @@ start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 # Data
 #print('==> Preparing data..')
 transform_train = transforms.Compose([
-    transforms.RandomHorizontalFlip(),
+    #transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
-    transforms.Normalize((0.1307,), (0.3081,)),
+    #transforms.Normalize((0.1307,), (0.3081,)),
 ])
 
 transform_test = transforms.Compose([
     transforms.ToTensor(),
-    transforms.Normalize((0.1307,), (0.3081,)),
+    #transforms.Normalize((0.1307,), (0.3081,)),
 ])
 
-trainset = torchvision.datasets.MNIST(root='\datasets', train=True, download=True, transform=transform_train)
+# trainset = torchvision.datasets.MNIST(root='\datasets', train=True, download=True, transform=transform_train)
+# trainloader = torch.utils.data.DataLoader(trainset, batch_size=100, shuffle=False, num_workers=2)
+
+# testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
+# testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
+trainset = torchvision.datasets.FashionMNIST(root='\datasets', train=True, download=True, transform=transform_train)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=100, shuffle=False, num_workers=2)
 
-testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
+testset = torchvision.datasets.FashionMNIST(root='\datasets', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
 
-classes = ('0','1','2','3','4','5','6','7','8','9')
+#classes = ('0','1','2','3','4','5','6','7','8','9')
 
 
 # Model
 #print('==> Building model..')
-net =  MNIST_MLP(
-    non_negative = [False, False, False], 
-    norm = [False, False, False])
+net =  FMNIST_MLP(
+    non_negative = [False, False, False, False, False, False], 
+    norm = [False, False, False,False, False, False])
     # non_negative = [True, True, True], 
     # norm = [True, True, True])
     # non_negative = [True, True, True], 
@@ -78,7 +83,7 @@ if args.resume:
     # Load checkpoint.
     print('==> Resuming from checkpoint..')
     assert os.path.isdir('checkpoint/normal'), 'Error: no checkpoint directory found!'
-    checkpoint = torch.load('./checkpoint/normal/ckpt.pth')
+    checkpoint = torch.load(r'C:\Users\hueda\Documents\Model_robust_weight_perturbation\interval_bound_propagation\checkpoint\normal\ckpt.pth')
     net.load_state_dict(checkpoint['net'])
     best_acc = checkpoint['acc_nor']
     start_epoch = checkpoint['epoch']
@@ -96,7 +101,7 @@ ep_b_schedule = generate_epsilon_schedule_MNIST(ep_b)
 ep_a_schedule = generate_epsilon_schedule_MNIST(ep_a)
 
 # Training
-def train(epoch):
+def train(epoch,batch_counter):
     print('\nEpoch: %d' % epoch)
     #print('\nBatch_counter: %d' % batch_counter)
     net.train()
@@ -110,6 +115,8 @@ def train(epoch):
     if epoch>50:
         lr/=10
     if epoch>75:
+        lr/=10
+    if epoch>100: 
         lr/=10
     optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9, weight_decay=5e-4)
 
@@ -132,11 +139,11 @@ def train(epoch):
     print('Loss in training: %.3f' % (train_loss / 600))
     net.eval()
     print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
-    acc_nor = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
-    acc_rob = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 2/255, 
-                                                                                  ep_w=2/255,
-                                                                                  ep_b=2/255,
-                                                                                  ep_a=2/255)
+    acc_nor,_ = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
+    acc_rob,_ = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 1/255, 
+                                                                                  ep_w=1/255,
+                                                                                  ep_b=1/255,
+                                                                                  ep_a=1/255)
 
     if acc_nor > best_acc:
         print('Saving..')
@@ -146,9 +153,9 @@ def train(epoch):
             'acc_rob': acc_rob,
             'epoch': epoch,
         }
-        if not os.path.isdir('checkpoint/normal/'):
-            os.mkdir('checkpoint/normal')
-        torch.save(state, './checkpoint/normal/ckpt.pth')
+        if not os.path.isdir('checkpoint/FMNIST/'):
+            os.mkdir('checkpoint/FMNIST')
+        torch.save(state, './checkpoint/FMNIST/normal.pth')
         best_acc = acc_nor
         rob_acc = acc_rob
         print("best_acc: ", best_acc)

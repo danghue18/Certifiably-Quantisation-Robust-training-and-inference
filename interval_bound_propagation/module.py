@@ -52,7 +52,7 @@ class RobustLinear(nn.Module):
         #     out_u = F.linear(input_u, F.relu(self.weight), self.bias) - F.linear(input_l, self.epsilon_w, self.epsilon_b)
         #     return torch.cat([out_l, out_u], 0)
         
-        u = (input_l + input_u)/2
+        u = (input_u + input_l)/2
         r = (input_u - input_l)/2
         out_u = F.linear(u, self.weight, self.bias) + epsilon_w * torch.norm(u, p=1, dim=1, keepdim=True)
         out_r = F.linear(r, torch.abs(self.weight), None) + epsilon_w * torch.norm(r, p=1, dim=1, keepdim=True) + epsilon_b
@@ -77,22 +77,23 @@ class RobustConv2d(nn.Module):
         self.groups = 1
         self.non_negative = non_negative
 
-    def forward(self, input):
-        input_p = input[:input.shape[0]//2]
-        input_n = input[input.shape[0]//2:]
+    def forward(self, input, epsilon_w=0, epsilon_b=0):
+        input_u = input[:input.shape[0]//2]
+        input_l = input[input.shape[0]//2:]
+
         if self.non_negative:
-            out_p = F.conv2d(input_p, F.relu(self.weight), self.bias, self.stride,
+            out_p = F.conv2d(input_u, F.relu(self.weight+epsilon_w), self.bias+epsilon_b, self.stride,
                         self.padding, self.dilation, self.groups)
-            out_n = F.conv2d(input_n, F.relu(self.weight), self.bias, self.stride,
+            out_n = F.conv2d(input_l, F.relu(self.weight-epsilon_w), self.bias-epsilon_b, self.stride,
                         self.padding, self.dilation, self.groups)
             return torch.cat([out_p, out_n],0)
             
-        u = (input_p + input_n)/2
-        r = (input_p - input_n)/2
+        u = (input_u + input_l)/2
+        r = (input_u - input_l)/2 
         out_u = F.conv2d(u, self.weight,self.bias, self.stride,
-                        self.padding, self.dilation, self.groups)
+                        self.padding, self.dilation, self.groups) + epsilon_w * torch.norm(u, p=1, dim=1, keepdim=True)
         out_r = F.conv2d(r, torch.abs(self.weight), None, self.stride,
-                        self.padding, self.dilation, self.groups)
+                        self.padding, self.dilation, self.groups) + epsilon_w * torch.norm(r, p=1, dim=1, keepdim=True) + epsilon_b
         return torch.cat([out_u + out_r, out_u - out_r], 0)
 
 
@@ -101,12 +102,13 @@ class RobustReLu(nn.Module):
         super(RobustReLu, self).__init__()
 
     def forward(self, input, epsilon_a):
-        input_U = input[:input.shape[0] // 2]
-        input_L = input[input.shape[0] // 2:]
+        input_u = input[:input.shape[0]//2]
+        input_l = input[input.shape[0]//2:]
         
         # Áp dụng ReLU và epsilon_a
-        z_L = nn.functional.relu(input_L - epsilon_a)
-        z_U = nn.functional.relu(input_U) + epsilon_a
+        z_U = nn.functional.relu(input_u) + epsilon_a
+        z_L = nn.functional.relu(input_l - epsilon_a)
+        
 
         return torch.cat([z_U, z_L], 0)
 

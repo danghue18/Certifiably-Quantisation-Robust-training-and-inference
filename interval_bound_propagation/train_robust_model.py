@@ -35,7 +35,7 @@ args = parser.parse_args()
 
 #print(torch.cuda.is_available())
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-print('Using device: ', device)
+#print('Using device: ', device)
 best_acc = 0  # best test accuracy
 nor_acc = 0
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
@@ -53,6 +53,38 @@ loss_val_robust = []
 
 # Data
 #print('==> Preparing data..')
+# transform_train = transforms.Compose([
+#     #transforms.RandomHorizontalFlip(),
+#     transforms.ToTensor(),
+#     #transforms.Normalize((0.1307,), (0.3081,)),
+# ])
+
+# transform_test = transforms.Compose([
+#     transforms.ToTensor(),
+#     #transforms.Normalize((0.1307,), (0.3081,)),
+# ])
+
+# trainset = torchvision.datasets.FashionMNIST(root='datasets', train=True, download=True, transform=transform_train)
+# trainloader = torch.utils.data.DataLoader(trainset, batch_size=100, shuffle=False, num_workers=2)
+
+# testset = torchvision.datasets.FashionMNIST(root='datasets', train=False, download=True, transform=transform_test)
+# testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
+
+# Model
+#print('==> Building model..')
+# net =  FMNIST_MLP(
+#     non_negative = [False, False, False,False, False, False], 
+#     norm = [False, False, False, False, False, False])
+#     # non_negative = [True, True, True], 
+#     # norm = [True, True, True])
+#     # non_negative = [True, True, True], 
+#     # norm = [False, False, False])
+# net = net.to(device)
+# if device == 'cuda':
+#     net = torch.nn.DataParallel(net)
+#     cudnn.benchmark = True
+
+#print('==> Preparing data..')
 transform_train = transforms.Compose([
     #transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
@@ -64,34 +96,30 @@ transform_test = transforms.Compose([
     transforms.Normalize((0.1307,), (0.3081,)),
 ])
 
-trainset = torchvision.datasets.MNIST(root='datasets', train=True, download=True, transform=transform_train)
+trainset = torchvision.datasets.MNIST(root='\datasets', train=True, download=True, transform=transform_train)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=100, shuffle=False, num_workers=2)
 
-testset = torchvision.datasets.MNIST(root='datasets', train=False, download=True, transform=transform_test)
+testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
 
-classes = ('0','1','2','3','4','5','6','7','8','9')
+#classes = ('0','1','2','3','4','5','6','7','8','9')
 
-
-# Model
-#print('==> Building model..')
+#Model
+print('==> Building model..')
 net =  MNIST_MLP(
     non_negative = [False, False, False], 
     norm = [False, False, False])
-    # non_negative = [True, True, True], 
-    # norm = [True, True, True])
-    # non_negative = [True, True, True], 
-    # norm = [False, False, False])
-net = net.to(device)
+
 if device == 'cuda':
     net = torch.nn.DataParallel(net)
     cudnn.benchmark = True
+net = net.to(device)
 
 if args.resume:
     # Load checkpoint.
     print('==> Resuming from checkpoint..')
     assert os.path.isdir('checkpoint'), 'Error: no checkpoint directory found!'
-    checkpoint = torch.load('./checkpoint/ckpt.pth')
+    checkpoint = torch.load(r'C:\Users\hueda\Documents\Model_robust_weight_perturbation\interval_bound_propagation\checkpoint\FMNIST\running_eps_1_255.pth')
     net.load_state_dict(checkpoint['net'])
     best_acc = checkpoint['acc_rob']
     start_epoch = checkpoint['epoch']
@@ -139,7 +167,7 @@ def train(epoch, batch_counter):
     if epoch>75:
         lr/=10
     if epoch>100: 
-        lr/=2
+        lr/=10
     optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9, weight_decay=5e-4)
 
     for batch_idx, (inputs, targets) in enumerate(trainloader):
@@ -152,7 +180,7 @@ def train(epoch, batch_counter):
         outputs_nor  = outputs_nor[:outputs_nor.shape[0]//2]
         loss += kappa_schedule[batch_counter] * criterion(outputs_nor, targets)
 
-        if batch_counter >= 2400: 
+        if batch_counter >= 3000: 
             x_ub = inputs + ep_i_schedule[batch_counter]
             x_lb = inputs - ep_i_schedule[batch_counter]
             outputs = net.forward(torch.cat([x_ub, x_lb], 0), epsilon_w=ep_w_schedule[batch_counter],
@@ -173,82 +201,43 @@ def train(epoch, batch_counter):
 
     #print('Loss in training: %.3f' % (train_loss / 600))
     net.eval()
-    if batch_counter < 2400: 
-        _, loss_train = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
-        acc_nor, loss_val = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
-        acc_rob = acc_nor
-
-    if batch_counter >= 2400 and batch_counter < 14400: 
-        print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
-        _, loss_train = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = ep_i_schedule[batch_counter], 
-                                                                        ep_w=ep_w_schedule[batch_counter],
-                                                                        ep_b=ep_b_schedule[batch_counter],
-                                                                        ep_a=ep_a_schedule[batch_counter])
-        
-        acc_nor,_ = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
-        acc_rob, loss_val = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = ep_i_schedule[batch_counter], 
-                                                                        ep_w=ep_w_schedule[batch_counter],
-                                                                        ep_b=ep_b_schedule[batch_counter],
-                                                                        ep_a=ep_a_schedule[batch_counter])
-
-    if batch_counter >= 14400:
-        #     print_accuracy(net, trainloader, testloader, device, test=True, eps = 2/255)
-        print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
-        _, loss_train = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = ep_i_schedule[batch_counter], 
-                                                                         ep_w=ep_w_schedule[batch_counter],
-                                                                         ep_b=ep_b_schedule[batch_counter],
-                                                                         ep_a=ep_a_schedule[batch_counter])
-        
-        acc_nor,_ = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
-        acc_rob, loss_val = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = ep_i_schedule[batch_counter], 
-                                                                                  ep_w=ep_w_schedule[batch_counter],
-                                                                                  ep_b=ep_b_schedule[batch_counter],
-                                                                                  ep_a=ep_a_schedule[batch_counter])
-
-
-        if acc_rob > best_acc:
-            print('Saving..')
-            state = {
-                'net': net.state_dict(),
-                'acc_nor': acc_nor,
-                'acc_rob': acc_rob,
-                'epoch': epoch,
-            }
-            if not os.path.isdir('checkpoint/test_k'):
-                os.mkdir('checkpoint/test_k')
-            torch.save(state, './checkpoint/test_k/ckpt.pth')
-            best_acc = acc_rob
-            print("best_acc: ", best_acc)
-            nor_acc = acc_nor
-            print("nor_acc: ", nor_acc)
-
-    # Non Robust and Robust loss
+    #     print_accuracy(net, trainloader, testloader, device, test=True, eps = 2/255)
     _, l = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
     loss_train_non_robust.append(l)
-    _, l = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = args.ep_i, 
-                                                                    ep_w=args.ep_w,
-                                                                    ep_b=args.ep_b,
-                                                                    ep_a=args.ep_a)
-    loss_train_robust.append(l)
+    _, loss_train = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = args.ep_i, 
+                                                                ep_w=args.ep_w,
+                                                                ep_b=args.ep_b,
+                                                                ep_a=args.ep_a)
     
-    _, l = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
-    loss_val_non_robust.append(l)
-    _, l = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = args.ep_i, 
-                                                                                ep_w=args.ep_w,
-                                                                                ep_b=args.ep_b,
-                                                                                ep_a=args.ep_a)
-    loss_val_robust.append(l)
-    
-    # Log
-    acc_nor_list.append(acc_nor)
-    acc_rob_list.append(acc_rob)
     loss_train_list.append(loss_train)
+
+    acc_nor,l = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
+    acc_nor_list.append(acc_nor)
+    loss_val_non_robust.append(l)
+    acc_rob, loss_val = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = args.ep_i, 
+                                                                            ep_w=args.ep_w,
+                                                                            ep_b=args.ep_b,
+                                                                            ep_a=args.ep_a)
+    acc_rob_list.append(acc_rob)
     loss_val_list.append(loss_val)
+    if acc_rob > best_acc:
+        print('Saving..')
+        state = {
+            'net': net.state_dict(),
+            'acc_nor': acc_nor,
+            'acc_rob': acc_rob,
+            'epoch': epoch,
+        }
+        if not os.path.isdir('checkpoint/MNIST'):
+            os.mkdir('checkpoint/MNIST')
+        torch.save(state, './checkpoint/MNIST/running_eps_1_255.pth')
+        best_acc = acc_rob
+        print("best_acc: ", best_acc)
+        nor_acc = acc_nor
+        print("nor_acc: ", nor_acc)
 
     epoch+= 1
-    #print('batch_counter after 1 epoch: ', batch_counter)
-    # k_list.append(kappa_schedule[batch_counter])
-    # eps_list.append(ep_i_schedule[batch_counter])
+
 
 if __name__=="__main__":
     freeze_support()  # This is necessary for Windows when using multiprocessing
@@ -264,25 +253,8 @@ if __name__=="__main__":
     result = {'acc_rob': acc_rob_list, 'acc_nor': acc_nor_list, 'loss_train': loss_train_list, 'loss_val': loss_val_list,
                 'loss_train_robust': loss_train_robust, 'loss_train_non_robust': loss_train_non_robust, 
                 'loss_val_robust': loss_val_robust, 'loss_val_non_robust': loss_val_non_robust}
-    path = f'results/training_phase/kappa_strategy/running_eps_{ep_w}_k_{k}.xlsx'
+    path = f'results/training_phase/MNIST/running_eps_{ep_a}_k_{k}.xlsx'
     DictExcelSaver.save(result,path)
 
-    
-    # epoch_list = [x for x in range(start_epoch, start_epoch + 198)]
-    # plt.plot(epoch_list, acc_rob_list, label='robust_acc', marker='o')
-    # plt.plot(epoch_list, acc_nor_list, label='normal_acc', marker='s')
-    # # Add title and labels
-    # plt.title('Accuracy in training process with k = 0.5')
-    # plt.xlabel('epoch')
-    # plt.ylabel('Accuracy')
-
-    # # Show legend
-    # plt.legend()
-
-    # # Show grid
-    # plt.grid(True)
-
-    # # Display the graph
-    # plt.show()
 
 

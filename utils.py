@@ -3,6 +3,7 @@ import time
 import os
 import ctypes
 import struct
+import pandas as pd
 
 
 TOTAL_BAR_LENGTH = 65.
@@ -18,7 +19,7 @@ def get_terminal_size():
         # Retrieve the console screen buffer information
         ctypes.windll.kernel32.GetConsoleScreenBufferInfo(h, csbi)
         # Unpack the buffer into console screen buffer info fields
-        (x, y, _, _, _, _, _, _, _, _) = struct.unpack("hhhhHhhhhhh", csbi.raw)
+        (x, y, _, _, _, _, _, _, _, _, _) = struct.unpack("hhhhHhhhhhh", csbi.raw)
         return y, x
     except Exception as e:
         print(f"Error getting terminal size: {e}")
@@ -26,9 +27,8 @@ def get_terminal_size():
 
 # Example usage
 term_height, term_width = get_terminal_size()
-# print(f"Terminal width: {term_width}, height: {term_height}")
+#print(f"Terminal width: {term_width}, height: {term_height}")
 
-# _, term_width = os.popen('stty size', 'r').read().split()
 term_width = int(term_width)
 
 
@@ -107,3 +107,15 @@ def progress_bar(current, total, msg=None):
     else:
         sys.stdout.write('\n')
     sys.stdout.flush()
+
+
+class DictExcelSaver:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def save(d, fp, sheet_name='Sheet1'):
+        df = pd.DataFrame(data=d.values(), index=d.keys())
+        df = df.T
+
+        df.to_excel(fp, sheet_name=sheet_name, index=False)

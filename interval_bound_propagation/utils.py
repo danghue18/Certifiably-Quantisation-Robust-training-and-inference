@@ -14,7 +14,7 @@ def generate_kappa_schedule_MNIST(k=0.5):
 
     kappa_schedule = 2400*[1] # warm-up phase
     kappa_value = 1.0
-    step = 0.5/57600
+    step = k/57600
     
     # for i in range(57600):
     #     kappa_value = kappa_value - step
@@ -38,7 +38,72 @@ def generate_epsilon_schedule_MNIST(epsilon_train):
         epsilon_schedule.append(epsilon_train)
     # for i in range(57600+60000):
     #     epsilon_schedule.append(epsilon_train)
-    # return epsilon_schedule
+    return epsilon_schedule
+
+
+def generate_kappa_schedule_CIFAR10(k=0.5):
+
+    kappa_schedule = 12000*[1] # warm-up phase
+    kappa_value = 1.0
+    #step = k/12000
+    
+    # for i in range(12000):
+        # kappa_value = kappa_value - step
+        # kappa_schedule.append(kappa_value)
+
+    # for i in range(60000):
+    #     kappa_schedule.append(0.5)
+
+    for i in range(57600+60000):
+        kappa_schedule.append(k)
+    return kappa_schedule
+
+def generate_epsilon_schedule_CIFAR10(epsilon_train):
+    
+    epsilon_schedule = 12000*[0]
+    step = epsilon_train/12000
+    for i in range(12000):
+        epsilon_schedule.append(i*step) #warm-up phase
+    
+    for i in range(45600+60000):
+        epsilon_schedule.append(epsilon_train)
+    # for i in range(57600+60000):
+    #     epsilon_schedule.append(epsilon_train)
+    return epsilon_schedule
+
+def generate_kappa_schedule_SVHN(k=0.7):
+
+    kappa_schedule = 6000*[1] # warm-up phase
+    # kappa_value = 1.0
+    # step = k/24000
+    
+    # for i in range(24000):
+    #     kappa_value = kappa_value - step
+    #     kappa_schedule.append(kappa_value)
+
+    # for i in range(60000):
+    #     kappa_schedule.append(0.5)
+
+    for i in range(200000):
+        kappa_schedule.append(k)
+    return kappa_schedule
+
+def generate_epsilon_schedule_SVHN(epsilon_train):
+    
+    epsilon_schedule = 6000*[0]
+    step = epsilon_train/15000
+    for i in range(15000):
+        epsilon_schedule.append(i*step) #warm-up phase
+    
+    for i in range(200000):
+        epsilon_schedule.append(epsilon_train)
+    # for i in range(57600+60000):
+    #     epsilon_schedule.append(epsilon_train)
+    return epsilon_schedule
+
+
+
+
 
 
 def get_terminal_size():

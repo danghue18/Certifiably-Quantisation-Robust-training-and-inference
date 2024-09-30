@@ -49,5 +49,5 @@ def print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep
     print('@number of batch: ' ,len(loader))
     loss_aver = check_loss/len(loader)
 
-    print('Accuracy of the network on the', total, loadertype, 'images: ',correct, 'with epsilon = ', ep_i)
+    print('Accuracy of the network on the', total, loadertype, 'images: ',correct, 'with epsilon = ', ep_w)
     return correct, loss_aver
