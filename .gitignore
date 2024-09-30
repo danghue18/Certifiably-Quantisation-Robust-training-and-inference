@@ -5,8 +5,7 @@ interval_bound_propagation/datasets/*
 interval_bound_propagation/results/training_phase/*
 #interval_bound_propagation/checkpoint/test_k/*.pth
 verification/datasets/*
-quantization/datasets/cifar-10-batches-py/*
- quantization/datasets/*
+quantization/datasets/*
 
 
 
