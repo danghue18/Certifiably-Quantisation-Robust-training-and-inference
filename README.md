@@ -56,4 +56,3 @@ To run 2/4 experiments, use:
  ```bash
  ./sub_run_verification_1.sh
  ./sub_run_verification_1.sh
- ```
