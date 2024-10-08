@@ -33,7 +33,7 @@ transform_test = transforms.Compose([
 
 testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
 
-indices = list(range(0, 1000))
+indices = list(range(0, 100))
 testloader = torch.utils.data.DataLoader(testset, batch_size=1, sampler=indices, num_workers=2)
 # testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
 
