@@ -6,13 +6,19 @@ import gurobipy as gp
 from gurobipy import GRB
 import torch.backends.cudnn as cudnn
 import time
-import threading
 
-
+from dotenv import load_dotenv
 import sys
+import os
 
-new_path = "C:/Users/hueda/Documents/Model_robust_weight_perturbation"
-sys.path.append(new_path) 
+load_dotenv()
+
+
+root = os.getenv('ROOT')
+checkpoint_path = os.path.join(root, os.getenv("CHECKPOINT_PATH15"))
+weight_folder = os.path.join(root,os.getenv('WEIGHT_FOLDER15'))
+
+sys.path.append(root)
 from interval_bound_propagation.network import *
 from interval_bound_propagation.utils import DictExcelSaver
 
@@ -26,12 +32,12 @@ transform_test = transforms.Compose([
 
 testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
 
-indices = list(range(0, 100))
+indices = list(range(0, 50))
 testloader = torch.utils.data.DataLoader(testset, batch_size=1, sampler=indices, num_workers=2)
 # testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
 
 # load net to compute original prediction and bounds of each linear output
-n_hidden_nodes = 64
+n_hidden_nodes = 256
 net =  MNIST_6layers(
     non_negative = [False, False, False, False, False, False], 
     norm = [False, False, False,False, False, False], 
@@ -42,45 +48,43 @@ if device == 'cuda':
 net = net.to(device)
 
 # Load checkpoint.
-checkpoint_path = f'C:/Users/hueda/Documents/Model_robust_weight_perturbation/interval_bound_propagation/checkpoint/MNIST/normal_6_layers_{n_hidden_nodes}.pth'
 checkpoint = torch.load(checkpoint_path)
 net.load_state_dict(checkpoint['net'])
 
 #load weight files
 model_dictionary = {}
-folder_name = f'extracted_params/MNIST/normal_6_layers_{n_hidden_nodes}/'
 
 # load trained weights and biases in model_dictionary
 name = 'linear_layers'
 for i in ['1', '2', '3', '4', '5', '6']: 
-    model_dictionary[name+i+'weight'] = torch.from_numpy(np.load(folder_name+name+i+'.weight.npy')).cuda()
-    model_dictionary[name+i+'bias']= torch.from_numpy(np.load(folder_name+name+i+'.bias.npy')).cuda()
+    model_dictionary[name+i+'weight'] = torch.from_numpy(np.load(weight_folder+name+i+'.weight.npy')).cuda()
+    model_dictionary[name+i+'bias']= torch.from_numpy(np.load(weight_folder+name+i+'.bias.npy')).cuda()
     #print('done with '+name+i)
 
-def optimize_with_timeout(model, timeout):
-    """
-    Run optimize model in timeout
-    If the optimiser can't answer in timeout seconds, stop the process and marked the sample as non-robust.
-    """
-    def optimize_model():
-        try:
-            model.optimize()
-        except gp.GurobiError as e:
-            print(f"Error optimizing Gurobi model: {e}")
+# def optimize_with_timeout(model, timeout):
+#     """
+#     Run optimize model in timeout
+#     If the optimiser can't answer in timeout seconds, stop the process and marked the sample as non-robust.
+#     """
+#     def optimize_model():
+#         try:
+#             model.optimize()
+#         except gp.GurobiError as e:
+#             print(f"Error optimizing Gurobi model: {e}")
 
-    # generate a thread to run optimize process
-    thread = threading.Thread(target=optimize_model)
-    thread.start()
+#     # generate a thread to run optimize process
+#     thread = threading.Thread(target=optimize_model)
+#     thread.start()
     
-    # Wait for `timeout` seconds
-    thread.join(timeout)
+#     # Wait for `timeout` seconds
+#     thread.join(timeout)
 
-    # If thread is still running after timeout, stop and mark as non-robust
-    if thread.is_alive():
-        print(f"Optimization exceeded {timeout} seconds. Marking as non-robust.")
-        return False  
-    else:
-        return True  # Optimization completed in time
+#     # If thread is still running after timeout, stop and mark as non-robust
+#     if thread.is_alive():
+#         print(f"Optimization exceeded {timeout} seconds. Marking as non-robust.")
+#         return False  
+#     else:
+#         return True  # Optimization completed in time
 
 def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsilon_weight=2/255, epsilon_bias=2/255, epsilon_activation=2/255):
     time_exceed = 0
@@ -390,6 +394,9 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         print(f'---------------done {total} samples, worst case discrepancy found is {worst_case_dis}')    
 
     print(f"*************Worst case discrepancy with ep_i = {epsilon_input}, ep_w = {epsilon_weight}, ep_b = {epsilon_bias},ep_a = {epsilon_activation}: {worst_case_dis}")
-    
+    print(f"*************Worst case discrepancy with ep_i = {epsilon_input}, ep_w = {epsilon_weight}, ep_b = {epsilon_bias},ep_a = {epsilon_activation}: {worst_case_dis}")
+    result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 'Worst case discrepancy': worst_case_dis }
+    path = f'opt_results/exp15.xlsx'
+    DictExcelSaver.save(result,path)
 if __name__ == '__main__':
     test_robustness(model_dictionary,net, testloader, epsilon_input=1/1023, epsilon_weight=1/1023, epsilon_bias=1/1023, epsilon_activation=1/1023)

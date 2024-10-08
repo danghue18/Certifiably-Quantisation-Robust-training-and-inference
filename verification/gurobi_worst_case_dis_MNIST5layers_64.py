@@ -6,13 +6,19 @@ import gurobipy as gp
 from gurobipy import GRB
 import torch.backends.cudnn as cudnn
 import time
-import threading
 
-
+from dotenv import load_dotenv
 import sys
+import os
 
-new_path = "C:/Users/hueda/Documents/Model_robust_weight_perturbation"
-sys.path.append(new_path) 
+load_dotenv()
+
+
+root = os.getenv('ROOT')
+checkpoint_path = os.path.join(root, os.getenv("CHECKPOINT_PATH9"))
+weight_folder = os.path.join(root,os.getenv('WEIGHT_FOLDER9'))
+
+sys.path.append(root)
 from interval_bound_propagation.network import *
 from interval_bound_propagation.utils import DictExcelSaver
 
@@ -26,7 +32,7 @@ transform_test = transforms.Compose([
 
 testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
 
-indices = list(range(0, 100))
+indices = list(range(0, 50))
 testloader = torch.utils.data.DataLoader(testset, batch_size=1, sampler=indices, num_workers=2)
 # testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
 
@@ -42,19 +48,17 @@ if device == 'cuda':
 net = net.to(device)
 
 # Load checkpoint.
-checkpoint_path = f'C:/Users/hueda/Documents/Model_robust_weight_perturbation/interval_bound_propagation/checkpoint/MNIST/normal_5_layers_{n_hidden_nodes}.pth'
 checkpoint = torch.load(checkpoint_path)
 net.load_state_dict(checkpoint['net'])
 
 #load weight files
 model_dictionary = {}
-folder_name = f'extracted_params/MNIST/normal_5_layers_{n_hidden_nodes}/'
 
 # load trained weights and biases in model_dictionary
 name = 'linear_layers'
 for i in ['1', '2', '3', '4', '5']: 
-    model_dictionary[name+i+'weight'] = torch.from_numpy(np.load(folder_name+name+i+'.weight.npy')).cuda()
-    model_dictionary[name+i+'bias']= torch.from_numpy(np.load(folder_name+name+i+'.bias.npy')).cuda()
+    model_dictionary[name+i+'weight'] = torch.from_numpy(np.load(weight_folder+name+i+'.weight.npy')).cuda()
+    model_dictionary[name+i+'bias']= torch.from_numpy(np.load(weight_folder+name+i+'.bias.npy')).cuda()
     #print('done with '+name+i)
 
 
@@ -334,6 +338,8 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         print(f'---------------done {total} samples, worst case discrepancy found is {worst_case_dis}')    
 
     print(f"*************Worst case discrepancy with ep_i = {epsilon_input}, ep_w = {epsilon_weight}, ep_b = {epsilon_bias},ep_a = {epsilon_activation}: {worst_case_dis}")
-    
+    result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 'Worst case discrepancy': worst_case_dis }
+    path = f'opt_results/exp9.xlsx'
+    DictExcelSaver.save(result,path)
 if __name__ == '__main__':
     test_robustness(model_dictionary,net, testloader, epsilon_input=1/1023, epsilon_weight=1/1023, epsilon_bias=1/1023, epsilon_activation=1/1023)

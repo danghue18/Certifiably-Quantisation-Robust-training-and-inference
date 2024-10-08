@@ -6,13 +6,19 @@ import gurobipy as gp
 from gurobipy import GRB
 import torch.backends.cudnn as cudnn
 import time
-import threading
 
-
+from dotenv import load_dotenv
 import sys
+import os
 
-new_path = "C:/Users/hueda/Documents/Model_robust_weight_perturbation"
-sys.path.append(new_path) 
+load_dotenv()
+
+
+root = os.getenv('ROOT')
+checkpoint_path = os.path.join(root, os.getenv("CHECKPOINT_PATH16"))
+weight_folder = os.path.join(root,os.getenv('WEIGHT_FOLDER16'))
+
+sys.path.append(root)
 from interval_bound_propagation.network import *
 from interval_bound_propagation.utils import DictExcelSaver
 
@@ -26,15 +32,15 @@ transform_test = transforms.Compose([
 
 testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
 
-indices = list(range(0, 100))
+indices = list(range(0, 50))
 testloader = torch.utils.data.DataLoader(testset, batch_size=1, sampler=indices, num_workers=2)
 # testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
 
 # load net to compute original prediction and bounds of each linear output
-n_hidden_nodes = 64
-net =  MNIST_4layers(
-    non_negative = [False, False, False, False], 
-    norm = [False, False, False, False], 
+n_hidden_nodes = 512
+net =  MNIST_6layers(
+    non_negative = [False, False, False, False, False, False], 
+    norm = [False, False, False,False, False, False], 
     n_hidden_nodes=n_hidden_nodes )
 if device == 'cuda':
     net = torch.nn.DataParallel(net)
@@ -42,21 +48,43 @@ if device == 'cuda':
 net = net.to(device)
 
 # Load checkpoint.
-checkpoint_path = f'C:/Users/hueda/Documents/Model_robust_weight_perturbation/interval_bound_propagation/checkpoint/MNIST/normal_4_layers_{n_hidden_nodes}.pth'
 checkpoint = torch.load(checkpoint_path)
 net.load_state_dict(checkpoint['net'])
 
 #load weight files
 model_dictionary = {}
-folder_name = f'extracted_params/MNIST/normal_4_layers_{n_hidden_nodes}/'
 
 # load trained weights and biases in model_dictionary
 name = 'linear_layers'
-for i in ['1', '2', '3', '4']: 
-    model_dictionary[name+i+'weight'] = torch.from_numpy(np.load(folder_name+name+i+'.weight.npy')).cuda()
-    model_dictionary[name+i+'bias']= torch.from_numpy(np.load(folder_name+name+i+'.bias.npy')).cuda()
+for i in ['1', '2', '3', '4', '5', '6']: 
+    model_dictionary[name+i+'weight'] = torch.from_numpy(np.load(weight_folder+name+i+'.weight.npy')).cuda()
+    model_dictionary[name+i+'bias']= torch.from_numpy(np.load(weight_folder+name+i+'.bias.npy')).cuda()
     #print('done with '+name+i)
 
+# def optimize_with_timeout(model, timeout):
+#     """
+#     Run optimize model in timeout
+#     If the optimiser can't answer in timeout seconds, stop the process and marked the sample as non-robust.
+#     """
+#     def optimize_model():
+#         try:
+#             model.optimize()
+#         except gp.GurobiError as e:
+#             print(f"Error optimizing Gurobi model: {e}")
+
+#     # generate a thread to run optimize process
+#     thread = threading.Thread(target=optimize_model)
+#     thread.start()
+    
+#     # Wait for `timeout` seconds
+#     thread.join(timeout)
+
+#     # If thread is still running after timeout, stop and mark as non-robust
+#     if thread.is_alive():
+#         print(f"Optimization exceeded {timeout} seconds. Marking as non-robust.")
+#         return False  
+#     else:
+#         return True  # Optimization completed in time
 
 def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsilon_weight=2/255, epsilon_bias=2/255, epsilon_activation=2/255):
     time_exceed = 0
@@ -80,8 +108,12 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         bias2 = model_gurobi.addVars(n_hidden_nodes, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="bias2")
         weight3 = model_gurobi.addVars(n_hidden_nodes, n_hidden_nodes, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="weight3")
         bias3 = model_gurobi.addVars(n_hidden_nodes, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="bias3")
-        weight4 = model_gurobi.addVars(10, n_hidden_nodes, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="weight4")
-        bias4 = model_gurobi.addVars(10, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="bias4")
+        weight4 = model_gurobi.addVars(n_hidden_nodes, n_hidden_nodes, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="weight4")
+        bias4 = model_gurobi.addVars(n_hidden_nodes, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="bias4")
+        weight5 = model_gurobi.addVars(n_hidden_nodes, n_hidden_nodes, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="weight5")
+        bias5 = model_gurobi.addVars(n_hidden_nodes, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="bias5")
+        weight6 = model_gurobi.addVars(10, n_hidden_nodes, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="weight6")
+        bias6 = model_gurobi.addVars(10, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="bias6")
 
         # input constraints
         for i in range(inputs.shape[1]):
@@ -102,10 +134,18 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
             for j in range(n_hidden_nodes): 
                 model_gurobi.addConstr(weight3[i,j] >= model_dictionary[name+'3weight'][i][j].item() - epsilon_weight, f"w3_lower_{i}_{j}")
                 model_gurobi.addConstr(weight3[i,j] <= model_dictionary[name+'3weight'][i][j].item() + epsilon_weight, f"w3_upper_{i}_{j}")
-        for i in range(10): 
+        for i in range(n_hidden_nodes): 
             for j in range(n_hidden_nodes): 
                 model_gurobi.addConstr(weight4[i,j] >= model_dictionary[name+'4weight'][i][j].item() - epsilon_weight, f"w4_lower_{i}_{j}")
                 model_gurobi.addConstr(weight4[i,j] <= model_dictionary[name+'4weight'][i][j].item() + epsilon_weight, f"w4_upper_{i}_{j}")
+        for i in range(n_hidden_nodes): 
+            for j in range(n_hidden_nodes): 
+                model_gurobi.addConstr(weight5[i,j] >= model_dictionary[name+'5weight'][i][j].item() - epsilon_weight, f"w5_lower_{i}_{j}")
+                model_gurobi.addConstr(weight5[i,j] <= model_dictionary[name+'5weight'][i][j].item() + epsilon_weight, f"w5_upper_{i}_{j}")
+        for i in range(10): 
+            for j in range(n_hidden_nodes): 
+                model_gurobi.addConstr(weight6[i,j] >= model_dictionary[name+'6weight'][i][j].item() - epsilon_weight, f"w6_lower_{i}_{j}")
+                model_gurobi.addConstr(weight6[i,j] <= model_dictionary[name+'6weight'][i][j].item() + epsilon_weight, f"w6_upper_{i}_{j}")
                 #print(model_dictionary[name+'3weight'][i][j].item())
         #bias constraints 
         for i in range(n_hidden_nodes): 
@@ -117,9 +157,15 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         for i in range(n_hidden_nodes): 
             model_gurobi.addConstr(bias3[i] >= model_dictionary[name+'3bias'][i].item() - epsilon_bias, f"b3_lower_{i}")
             model_gurobi.addConstr(bias3[i] <= model_dictionary[name+'3bias'][i].item() + epsilon_bias, f"b3_upper_{i}")
-        for i in range(10): 
+        for i in range(n_hidden_nodes): 
             model_gurobi.addConstr(bias4[i] >= model_dictionary[name+'4bias'][i].item() - epsilon_bias, f"b4_lower_{i}")
             model_gurobi.addConstr(bias4[i] <= model_dictionary[name+'4bias'][i].item() + epsilon_bias, f"b4_upper_{i}")
+        for i in range(n_hidden_nodes): 
+            model_gurobi.addConstr(bias5[i] >= model_dictionary[name+'5bias'][i].item() - epsilon_bias, f"b5_lower_{i}")
+            model_gurobi.addConstr(bias5[i] <= model_dictionary[name+'5bias'][i].item() + epsilon_bias, f"b5_upper_{i}")
+        for i in range(10): 
+            model_gurobi.addConstr(bias6[i] >= model_dictionary[name+'6bias'][i].item() - epsilon_bias, f"b6_lower_{i}")
+            model_gurobi.addConstr(bias6[i] <= model_dictionary[name+'6bias'][i].item() + epsilon_bias, f"b6_upper_{i}")
         #print("----------------done constraints for input, weights, bias")
         
         # check loaded weights
@@ -218,16 +264,64 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
             model_gurobi.addConstr(x4[i] >= 0)
 
         ###########################################################
-        # output layer (10 neurons)
-        output = model_gurobi.addVars(10, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="output")
+        # layer 4 (128 neurons)
+        linear_output4 = model_gurobi.addVars(n_hidden_nodes, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="linearoutput4") # define the linear output variables
+        activation4 = model_gurobi.addVars(n_hidden_nodes, lb=0, ub=GRB.INFINITY, name="activation4") #relu output
+        x5 = model_gurobi.addVars(n_hidden_nodes, lb=0, ub=GRB.INFINITY, name="x5") # input of layer 3
+        z4 = model_gurobi.addVars(n_hidden_nodes, vtype=GRB.BINARY, name="z4")  # binary variable for ReLU  
         upper_bound4 = bounds[3][0] # 128 upper bounds
         lower_bound4 = bounds[3][1] # 128 lower bounds 
+        for i in range(n_hidden_nodes):
+            model_gurobi.addConstr(linear_output4[i] == gp.quicksum([weight4[i, j] * x4[j] for j in range(n_hidden_nodes)]) + bias4[i])
+            if (lower_bound4[0,i].item()>upper_bound4[0, i].item()): 
+                print("***************CONFLICT*************")
+            model_gurobi.addConstr(activation4[i] <= linear_output4[i] - (1 - z4[i]) * lower_bound4[0,i].item())
+            model_gurobi.addConstr(activation4[i] >= linear_output4[i])  
+            model_gurobi.addConstr(activation4[i] <= z4[i] * upper_bound4[0, i].item())
+            model_gurobi.addConstr(activation4[i] >= 0)  
+
+            # model_gurobi.addConstr(activation2[i] >= linear_output2[i])
+            # model_gurobi.addConstr(activation2[i] <= upper_bound2[0, i]/(upper_bound2[0, i]-lower_bound2[0, i])*(linear_output2[i]-lower_bound2[0,i]))
+            # model_gurobi.addConstr(activation2[i] >= 0)  
+            
+            model_gurobi.addConstr(x5[i] >= activation4[i] - epsilon_activation, "x5_lower")
+            model_gurobi.addConstr(x5[i] <= activation4[i] + epsilon_activation, "x5_upper")
+            model_gurobi.addConstr(x5[i] >= 0)
+        ###################################################
+        # layer 5 (128 neurons)
+        linear_output5 = model_gurobi.addVars(n_hidden_nodes, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="linearoutput5") # define the linear output variables
+        activation5 = model_gurobi.addVars(n_hidden_nodes, lb=0, ub=GRB.INFINITY, name="activation5") #relu output
+        x6 = model_gurobi.addVars(n_hidden_nodes, lb=0, ub=GRB.INFINITY, name="x6") # input of layer 3
+        z5 = model_gurobi.addVars(n_hidden_nodes, vtype=GRB.BINARY, name="z5")  # binary variable for ReLU  
+        upper_bound5 = bounds[4][0] # 128 upper bounds
+        lower_bound5 = bounds[4][1] # 128 lower bounds 
+        for i in range(n_hidden_nodes):
+            model_gurobi.addConstr(linear_output5[i] == gp.quicksum([weight5[i, j] * x5[j] for j in range(n_hidden_nodes)]) + bias5[i])
+            if (lower_bound5[0,i].item()>upper_bound5[0, i].item()): 
+                print("***************CONFLICT*************")
+            model_gurobi.addConstr(activation5[i] <= linear_output5[i] - (1 - z5[i]) * lower_bound5[0,i].item())
+            model_gurobi.addConstr(activation5[i] >= linear_output5[i])  
+            model_gurobi.addConstr(activation5[i] <= z5[i] * upper_bound5[0, i].item())
+            model_gurobi.addConstr(activation5[i] >= 0)  
+            # model_gurobi.addConstr(activation2[i] >= linear_output2[i])
+            # model_gurobi.addConstr(activation2[i] <= upper_bound2[0, i]/(upper_bound2[0, i]-lower_bound2[0, i])*(linear_output2[i]-lower_bound2[0,i]))
+            # model_gurobi.addConstr(activation2[i] >= 0)  
+            
+            model_gurobi.addConstr(x6[i] >= activation5[i] - epsilon_activation, "x6_lower")
+            model_gurobi.addConstr(x6[i] <= activation5[i] + epsilon_activation, "x6_upper")
+            model_gurobi.addConstr(x6[i] >= 0)
+
+        ###########################################################
+        # output layer (10 neurons)
+        output = model_gurobi.addVars(10, lb=-GRB.INFINITY, ub=GRB.INFINITY, name="output")
+        upper_bound6 = bounds[5][0] # 128 upper bounds
+        lower_bound6 = bounds[5][1] # 128 lower bounds 
         for i in range(10):
-            model_gurobi.addConstr(output[i] == gp.quicksum([weight4[i, j] * x4[j] for j in range(n_hidden_nodes)]) + bias4[i])
-            model_gurobi.addConstr(output[i] >= lower_bound4[0,i].item())
+            model_gurobi.addConstr(output[i] == gp.quicksum([weight6[i, j] * x6[j] for j in range(n_hidden_nodes)]) + bias6[i])
+            model_gurobi.addConstr(output[i] >= lower_bound6[0,i].item())
             # print("----Output lower bound:", lower_bound3[0,i].item())
             # print("----Output upper bound:", upper_bound3[0,i].item())
-            model_gurobi.addConstr(output[i] <= upper_bound4[0,i].item())
+            model_gurobi.addConstr(output[i] <= upper_bound6[0,i].item())
 
         orig_outputs = net(torch.cat([inputs.to(device),inputs.to(device)], 0))
         value_fl_batch = orig_outputs[:orig_outputs .shape[0]//2]
@@ -300,6 +394,9 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         print(f'---------------done {total} samples, worst case discrepancy found is {worst_case_dis}')    
 
     print(f"*************Worst case discrepancy with ep_i = {epsilon_input}, ep_w = {epsilon_weight}, ep_b = {epsilon_bias},ep_a = {epsilon_activation}: {worst_case_dis}")
-    
+    print(f"*************Worst case discrepancy with ep_i = {epsilon_input}, ep_w = {epsilon_weight}, ep_b = {epsilon_bias},ep_a = {epsilon_activation}: {worst_case_dis}")
+    result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 'Worst case discrepancy': worst_case_dis }
+    path = f'opt_results/exp16.xlsx'
+    DictExcelSaver.save(result,path)
 if __name__ == '__main__':
     test_robustness(model_dictionary,net, testloader, epsilon_input=1/1023, epsilon_weight=1/1023, epsilon_bias=1/1023, epsilon_activation=1/1023)
