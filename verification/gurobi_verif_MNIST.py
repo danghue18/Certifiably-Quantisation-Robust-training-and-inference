@@ -7,8 +7,7 @@ from gurobipy import GRB
 import torch.backends.cudnn as cudnn
 import time
 import threading
-from torch.utils.data import DataLoader
-import multiprocessing as mp
+
 
 import sys
 
@@ -55,8 +54,6 @@ folder_name = r'C:\Users\hueda\Documents\Model_robust_weight_perturbation\quanti
 name = 'linear_layers'
 for i in ['1', '2', '3']: 
     model_dictionary[name+i+'weight'] = torch.from_numpy(np.load(folder_name+name+i+'.weight.npy')).cuda()
-    # print(model_dictionary[name+i+'weight'].size())
-    # print(model_dictionary[name+i+'weight'][0][1].item())
     model_dictionary[name+i+'bias']= torch.from_numpy(np.load(folder_name+name+i+'.bias.npy')).cuda()
     #print('done with '+name+i)
 
@@ -224,7 +221,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
             # print("----Output upper bound:", upper_bound3[0,i].item())
             model_gurobi.addConstr(output[i] <= upper_bound3[0,i].item())
 
-        # Objective function:  min_j≠t(P(f)(x)_t − P(f)(x)_j)
+        #Objective function:  min_j≠t(P(f)(x)_t − P(f)(x)_j)
         max_other_class = model_gurobi.addVar(lb=-GRB.INFINITY, ub=GRB.INFINITY, name="max_other_class")
         model_gurobi.addConstr(max_other_class == gp.max_([output[j] for j in range(10) if j != labels]))
 
@@ -260,7 +257,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
 
         total += 1
         end_time = time.time()
-        execution_time = end_time - start_time  # Tính thời gian thực thi
+        execution_time = end_time - start_time  
         print(f"Processed sample {batch_idx} in {execution_time:.2f} seconds.")
         print(f'---------------done {total} samples, robust: {robust_count}, non-robust: {non_robust_count} with {time_exceed} time exceeded samples ')
         
@@ -271,22 +268,5 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
     print(f"Non-robust samples: {non_robust_count}/{total} ({(100 - accuracy):.2f}%)")
     print("Numer of time out samples: ",time_exceed)
     
-
-# def run_test(epsilon_input, epsilon_weight, epsilon_bias, epsilon_activation):
-#     test_robustness(model_dictionary, net, testloader, 
-#                     epsilon_input=epsilon_input, 
-#                     epsilon_weight=epsilon_weight, 
-#                     epsilon_bias=epsilon_bias, 
-#                     epsilon_activation=epsilon_activation, 
-#                     timeout=600)
-
-# # List of different epsilon values to test
-# epsilon_sets = [
-#     (1/255, 0, 0, 0),
-#     (0, 0, 0, 1/255),
-#     (0, 2/255, 2/255, 0),
-# ]
 if __name__ == '__main__':
     test_robustness(model_dictionary,net, testloader, epsilon_input=0, epsilon_weight=2/255, epsilon_bias=2/255, epsilon_activation=0, timeout=600)
-    # with mp.Pool(processes=3) as pool: 
-    #     pool.starmap(run_test, epsilon_sets)
