@@ -49,10 +49,14 @@ Run the `run_verification.sh` file:
  ```bash
  ./run_experiments.sh
  ```
-The program will sequentially execute 4 .py files to test the robust accuracy of 4 models equivalent to the perturbation of 6 bits, 8 bits, 10 bits, 16 bits quantization.
+The program will sequentially execute 4 .py files to test the robust accuracy of robust models and the normal one with epsilon equivalent to the perturbation of 6 bits, 8 bits, 10 bits, 16 bits quantization.
 
 To run 2/4 experiments, use: 
 
  ```bash
  ./sub_run_verification_1.sh
- ./sub_run_verification_1.sh
+ ./sub_run_verification_2.sh
+
+To verify the normal model, use:
+  ./sub_run_verification_3.sh
+
