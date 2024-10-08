@@ -6,22 +6,22 @@ We address the problem of computing the worst-case discrepancy between the origi
 Follow the steps below to run the experiments:
 
 ### Step 1: Add Gurobi License
-1. Open the `licenses` folder and add the `gurobi.lic` file to your root directory (examples for both Windows: C:\Users\hueda\gurobi.lic).
+1. Open the `licenses` folder and add the `gurobi.lic` file to your root directory (examples for Windows: C:\Users\hueda\gurobi.lic).
    - This is the default directory where Gurobi will search for the license.
 
 ### Step 2: Navigate to the Verification Folder
-1. Move to 'Verification' directory:
     ```bash
     cd verification
     ```
 
 ### Step 3: Run the Experiments
-1. Run the `run_experiments.sh` file:
+1. Modify ROOT in the .env file with your root path. 
+2. Run the `run_experiments.sh` file:
     ```bash
     ./run_experiments.sh
     ```
-
-2. If the `run_experiments.sh` file does not have execution permission, add it using the following command:
+Note: Using run.experiments.bat for Windows
+3. If the `run_experiments.sh` file does not have execution permission, add it using the following command:
     ```bash
     chmod +x run_experiments.sh
     ```
