@@ -6,7 +6,7 @@ We address the problem of computing the worst-case discrepancy between the origi
 Follow the steps below to run the experiments:
 
 ### Step 1: Add Gurobi License
-1. Open the `licenses` folder and add the `gurobi.lic` file to your root directory (examples for Windows: C:\Users\hueda\gurobi.lic).
+1. Open the `licenses` folder and add the `gurobi_2.lic` file to your root directory (examples for Windows: C:\Users\hueda\gurobi.lic).
    - This is the default directory where Gurobi will search for the license.
 
 ### Step 2: Navigate to the Verification Folder
@@ -29,12 +29,13 @@ Follow the steps below to run the experiments:
 
 The program will sequentially execute 16 `.py` files, corresponding to 16 different experiments.
 To run 4/16 experiments, use: 
-    ```bash
-    ./sub_run1.sh
-    ./sub_run2.sh
-    ./sub_run3.sh
-    ./sub_run4.sh
-    ```
+
+ ```bash
+ ./sub_run1.sh
+ ./sub_run2.sh
+ ./sub_run3.sh
+ ./sub_run4.sh
+ ```
 
 ### Step 4: Run Experiments in Parallel (Optional)
 To optimize execution time, you can run multiple `.py` files in parallel using different terminals. This may be more efficient than using the `.sh` file:
@@ -45,12 +46,14 @@ The file_name values are defined in the run_experiments.sh file mentioned above.
 
 ## How to Run the Program verifying the robustness of a model against quantization 
 Run the `run_verification.sh` file:
-    ```bash
-    ./run_experiments.sh
-    ```
+ ```bash
+ ./run_experiments.sh
+ ```
 The program will sequentially execute 4 .py files to test the robust accuracy of 4 models equivalent to the perturbation of 6 bits, 8 bits, 10 bits, 16 bits quantization.
+
 To run 2/4 experiments, use: 
-    ```bash
-    ./sub_run_verification_1.sh
-    ./sub_run_verification_1.sh
-    ```
+
+ ```bash
+ ./sub_run_verification_1.sh
+ ./sub_run_verification_1.sh
+ ```
