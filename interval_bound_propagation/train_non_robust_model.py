@@ -38,35 +38,34 @@ start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 # Data
 #print('==> Preparing data..')
 transform_train = transforms.Compose([
-    #transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
-    #transforms.Normalize((0.1307,), (0.3081,)),
 ])
 
 transform_test = transforms.Compose([
     transforms.ToTensor(),
-    #transforms.Normalize((0.1307,), (0.3081,)),
 ])
 
-# trainset = torchvision.datasets.MNIST(root='\datasets', train=True, download=True, transform=transform_train)
-# trainloader = torch.utils.data.DataLoader(trainset, batch_size=100, shuffle=False, num_workers=2)
-
-# testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
-# testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
-trainset = torchvision.datasets.FashionMNIST(root='\datasets', train=True, download=True, transform=transform_train)
+trainset = torchvision.datasets.MNIST(root='\datasets', train=True, download=True, transform=transform_train)
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=100, shuffle=False, num_workers=2)
 
-testset = torchvision.datasets.FashionMNIST(root='\datasets', train=False, download=True, transform=transform_test)
+testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
+# trainset = torchvision.datasets.FashionMNIST(root='\datasets', train=True, download=True, transform=transform_train)
+# trainloader = torch.utils.data.DataLoader(trainset, batch_size=100, shuffle=False, num_workers=2)
+
+# testset = torchvision.datasets.FashionMNIST(root='\datasets', train=False, download=True, transform=transform_test)
+# testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
 
 #classes = ('0','1','2','3','4','5','6','7','8','9')
 
 
 # Model
 #print('==> Building model..')
-net =  FMNIST_MLP(
-    non_negative = [False, False, False, False, False, False], 
-    norm = [False, False, False,False, False, False])
+n_hidden_nodes = 512
+net =  MNIST_3layers(
+    non_negative = [False, False, False], 
+    norm = [False, False, False], 
+    n_hidden_nodes=n_hidden_nodes )
     # non_negative = [True, True, True], 
     # norm = [True, True, True])
     # non_negative = [True, True, True], 
@@ -83,7 +82,7 @@ if args.resume:
     # Load checkpoint.
     print('==> Resuming from checkpoint..')
     assert os.path.isdir('checkpoint/normal'), 'Error: no checkpoint directory found!'
-    checkpoint = torch.load(r'C:\Users\hueda\Documents\Model_robust_weight_perturbation\interval_bound_propagation\checkpoint\normal\ckpt.pth')
+    checkpoint = torch.load(r'C:\Users\hueda\Documents\Model_robust_weight_perturbation\interval_bound_propagation\checkpoint\MNIST/normal_6_layers\ckpt.pth')
     net.load_state_dict(checkpoint['net'])
     best_acc = checkpoint['acc_nor']
     start_epoch = checkpoint['epoch']
@@ -140,26 +139,29 @@ def train(epoch,batch_counter):
     net.eval()
     print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
     acc_nor,_ = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
-    acc_rob,_ = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 1/255, 
-                                                                                  ep_w=1/255,
-                                                                                  ep_b=1/255,
-                                                                                  ep_a=1/255)
+    # acc_rob,_ = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 1/255, 
+    #                                                                               ep_w=1/255,
+    #                                                                               ep_b=1/255,
+    #                                                                               ep_a=1/255)
 
     if acc_nor > best_acc:
         print('Saving..')
         state = {
             'net': net.state_dict(),
             'acc_nor': acc_nor,
-            'acc_rob': acc_rob,
+            #'acc_rob': acc_rob,
             'epoch': epoch,
         }
-        if not os.path.isdir('checkpoint/FMNIST/'):
-            os.mkdir('checkpoint/FMNIST')
-        torch.save(state, './checkpoint/FMNIST/normal.pth')
+        # if not os.path.isdir('checkpoint/FMNIST/'):
+        #     os.mkdir('checkpoint/FMNIST')
+        # torch.save(state, './checkpoint/FMNIST/normal.pth')
+        if not os.path.isdir('checkpoint/MNIST/'):
+            os.mkdir('checkpoint/MNIST')
+        torch.save(state, f'./checkpoint/MNIST/normal_3_layers_{n_hidden_nodes}.pth')
         best_acc = acc_nor
-        rob_acc = acc_rob
+        #rob_acc = acc_rob
         print("best_acc: ", best_acc)
-        print('robust_acc: ',rob_acc)
+        #print('robust_acc: ',rob_acc)
     
     epoch+= 1
 
@@ -171,4 +173,4 @@ if __name__=="__main__":
         batch_counter+=600
   
     print ("best_acc: ", best_acc)
-    print('robust_acc: ', rob_acc)
+    #print('robust_acc: ', rob_acc)

@@ -1,11 +1,16 @@
-checkpoint/*
-datasets/*
-#extracted_params/*
 interval_bound_propagation/datasets/*
-interval_bound_propagation/results/training_phase/*
-#interval_bound_propagation/checkpoint/test_k/*.pth
+interval_bound_propagation/results/*
+interval_bound_propagation/checkpoint/CIFAR10/*.pth
+interval_bound_propagation/checkpoint/FMIST/*.pth
+interval_bound_propagation/checkpoint/normal/*.pth
+interval_bound_propagation/checkpoint/SVHN/*.pth
 verification/datasets/*
+verification/opt_result/*.xlsx
 quantization/datasets/*
+quantization/quantization_results/*
+quantization/extract_params/*
+quantization/scalars/*
+
 
 
 

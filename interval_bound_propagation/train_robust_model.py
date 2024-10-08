@@ -26,10 +26,10 @@ from multiprocessing import freeze_support
 parser = argparse.ArgumentParser(description='PyTorch MNIST Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument('--k', default=0.5, type=float, help='kappa')
-parser.add_argument('--ep_i', default=1/255, type=float, help='epsilon_input')
-parser.add_argument('--ep_w', default=1/255, type=float, help='epsilon_weight')
-parser.add_argument('--ep_b', default=1/255, type=float, help='epsilon_bias')
-parser.add_argument('--ep_a', default=1/255, type=float, help='epsilon_activation')
+parser.add_argument('--ep_i', default=1/1024, type=float, help='epsilon_input')
+parser.add_argument('--ep_w', default=1/512, type=float, help='epsilon_weight')
+parser.add_argument('--ep_b', default=1/512, type=float, help='epsilon_bias')
+parser.add_argument('--ep_a', default=1/512, type=float, help='epsilon_activation')
 parser.add_argument('--resume', '-r', action='store_true', help='resume from checkpoint')
 args = parser.parse_args()
 
@@ -86,14 +86,11 @@ loss_val_robust = []
 
 #print('==> Preparing data..')
 transform_train = transforms.Compose([
-    #transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
-    transforms.Normalize((0.1307,), (0.3081,)),
 ])
 
 transform_test = transforms.Compose([
     transforms.ToTensor(),
-    transforms.Normalize((0.1307,), (0.3081,)),
 ])
 
 trainset = torchvision.datasets.MNIST(root='\datasets', train=True, download=True, transform=transform_train)
@@ -106,20 +103,28 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False,
 
 #Model
 print('==> Building model..')
-net =  MNIST_MLP(
-    non_negative = [False, False, False], 
-    norm = [False, False, False])
+n_hidden_nodes = 256
+net =  MNIST_4layers(
+    non_negative = [False, False, False,False], 
+    norm = [False, False, False, False], 
+    n_hidden_nodes=n_hidden_nodes )
+    # non_negative = [True, True, True], 
+    # norm = [True, True, True])
+    # non_negative = [True, True, True], 
+    # norm = [False, False, False])
+net = net.to(device)
 
+
+net = net.to(device)
 if device == 'cuda':
     net = torch.nn.DataParallel(net)
     cudnn.benchmark = True
-net = net.to(device)
 
 if args.resume:
     # Load checkpoint.
     print('==> Resuming from checkpoint..')
     assert os.path.isdir('checkpoint'), 'Error: no checkpoint directory found!'
-    checkpoint = torch.load(r'C:\Users\hueda\Documents\Model_robust_weight_perturbation\interval_bound_propagation\checkpoint\FMNIST\running_eps_1_255.pth')
+    checkpoint = torch.load(f'./checkpoint/MNIST/robust_6_layers_{n_hidden_nodes}_0_06.pth')
     net.load_state_dict(checkpoint['net'])
     best_acc = checkpoint['acc_rob']
     start_epoch = checkpoint['epoch']
@@ -164,7 +169,7 @@ def train(epoch, batch_counter):
     lr =args.lr
     if epoch>50:
         lr/=10
-    if epoch>75:
+    if epoch>75:    
         lr/=10
     if epoch>100: 
         lr/=10
@@ -230,7 +235,7 @@ def train(epoch, batch_counter):
         }
         if not os.path.isdir('checkpoint/MNIST'):
             os.mkdir('checkpoint/MNIST')
-        torch.save(state, './checkpoint/MNIST/running_eps_1_255.pth')
+        torch.save(state, f'./checkpoint/MNIST/robust_4_layers_{n_hidden_nodes}_10bits.pth')
         best_acc = acc_rob
         print("best_acc: ", best_acc)
         nor_acc = acc_nor
@@ -253,7 +258,7 @@ if __name__=="__main__":
     result = {'acc_rob': acc_rob_list, 'acc_nor': acc_nor_list, 'loss_train': loss_train_list, 'loss_val': loss_val_list,
                 'loss_train_robust': loss_train_robust, 'loss_train_non_robust': loss_train_non_robust, 
                 'loss_val_robust': loss_val_robust, 'loss_val_non_robust': loss_val_non_robust}
-    path = f'results/training_phase/MNIST/running_eps_{ep_a}_k_{k}.xlsx'
+    path = f'results/training_phase/MNIST/robust_4_layers_{n_hidden_nodes}_10bits.xlsx'
     DictExcelSaver.save(result,path)
 
 
