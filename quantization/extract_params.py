@@ -73,6 +73,7 @@ start_epoch = checkpoint['epoch']
 print("Model State Dictionary:")
 for param_tensor in net.state_dict():
     print(f"{param_tensor}\t{net.state_dict()[param_tensor].size()}")
+    print(param_tensor)
 
 folder = 'extracted_params/MNIST/'
 os.makedirs(folder, exist_ok=True)
