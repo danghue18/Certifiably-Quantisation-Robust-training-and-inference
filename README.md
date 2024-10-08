@@ -6,7 +6,7 @@ We address the problem of computing the worst-case discrepancy between the origi
 Follow the steps below to run the experiments:
 
 ### Step 1: Add Gurobi License
-1. Open the `licenses` folder and add the `gurobi.lic` file to your root directory (examples for Windows: C:\Users\hueda\gurobi.lic).
+1. Open the `licenses` folder and add the `gurobi_2.lic` file to your root directory (examples for Windows: C:\Users\hueda\gurobi.lic).
    - This is the default directory where Gurobi will search for the license.
 
 ### Step 2: Navigate to the Verification Folder
