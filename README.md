@@ -56,7 +56,8 @@ To run 2/4 experiments, use:
  ```bash
  ./sub_run_verification_1.sh
  ./sub_run_verification_2.sh
-
+ ```
+ 
 To verify the normal model, use:
   ./sub_run_verification_3.sh
 
