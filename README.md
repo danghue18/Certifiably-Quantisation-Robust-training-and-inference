@@ -32,3 +32,5 @@ The program will sequentially execute 16 `.py` files, corresponding to 16 differ
 To optimize execution time, you can run multiple `.py` files in parallel using different terminals. This may be more efficient than using the `.sh` file:
    ```bash
    python file_name.py
+   ```
+The file_name values are defined in the run_experiments.sh file mentioned above.
