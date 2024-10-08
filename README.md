@@ -10,6 +10,7 @@ Follow the steps below to run the experiments:
    - This is the default directory where Gurobi will search for the license.
 
 ### Step 2: Navigate to the Verification Folder
+1. Move to the verification directory:
     ```bash
     cd verification
     ```

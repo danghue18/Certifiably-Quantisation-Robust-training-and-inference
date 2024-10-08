@@ -25,11 +25,19 @@ if device == 'cuda':
     net = torch.nn.DataParallel(net)
     cudnn.benchmark = True
 net = net.to(device)
-
+# for param_tensor in net.to('cpu').state_dict():
+#     print(f"{param_tensor}\t{net.to('cpu').state_dict()[param_tensor].size()}")
+    #print(param_tensor)
 # Load checkpoint.
 checkpoint_path = f'C:/Users/hueda/Documents/Model_robust_weight_perturbation/interval_bound_propagation/checkpoint/MNIST/robust_4_layers_{n_hidden_nodes}_16bits.pth'
 checkpoint = torch.load(checkpoint_path)
 net.load_state_dict(checkpoint['net'])
+
+# print("Model State Dictionary:")
+# for param_tensor in net.state_dict():
+#     print(f"{param_tensor}\t{net.state_dict()[param_tensor].size()}")
+#     #print(param_tensor)
+
 
 folder = 'extracted_params/MNIST/'
 os.makedirs(folder, exist_ok=True)

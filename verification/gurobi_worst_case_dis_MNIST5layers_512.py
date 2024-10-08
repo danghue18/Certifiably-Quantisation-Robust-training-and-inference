@@ -15,7 +15,7 @@ load_dotenv()
 
 
 root = os.getenv('ROOT')
-checkpoint_path = os.path.join(root, os.getenv('CHECKPOINT_PATH12')
+checkpoint_path = os.path.join(root, os.getenv('CHECKPOINT_PATH12'))
 weight_folder = os.path.join(root,os.getenv('WEIGHT_FOLDER12'))
 
 sys.path.append(root)
@@ -42,14 +42,25 @@ net =  MNIST_5layers(
     non_negative = [False, False, False, False, False], 
     norm = [False, False, False,False, False], 
     n_hidden_nodes=n_hidden_nodes )
+net = net.to(device)
+
 if device == 'cuda':
     net = torch.nn.DataParallel(net)
     cudnn.benchmark = True
-net = net.to(device)
-
-# Load checkpoint.
-checkpoint = torch.load(checkpoint_path)
-net.load_state_dict(checkpoint['net'])
+    # Load checkpoint.
+    checkpoint = torch.load(checkpoint_path)
+    net.load_state_dict(checkpoint['net'])
+else: 
+    checkpoint = torch.load(checkpoint_path, map_location=torch.device('cpu'))
+    state_dict = checkpoint['net']
+    new_state_dict = {}
+    for key, value in state_dict.items():
+        if key.startswith('module.'):
+            new_key = key.replace('module.', '')
+        else:
+            new_key = key
+        new_state_dict[new_key] = value
+    net.load_state_dict(new_state_dict)
 
 #load weight files
 model_dictionary = {}
@@ -57,8 +68,8 @@ model_dictionary = {}
 # load trained weights and biases in model_dictionary
 name = 'linear_layers'
 for i in ['1', '2', '3', '4', '5']: 
-    model_dictionary[name+i+'weight'] = torch.from_numpy(np.load(weight_folder+name+i+'.weight.npy')).cuda()
-    model_dictionary[name+i+'bias']= torch.from_numpy(np.load(weight_folder+name+i+'.bias.npy')).cuda()
+    model_dictionary[name+i+'weight'] = torch.from_numpy(np.load(weight_folder+name+i+'.weight.npy')).to(device)
+    model_dictionary[name+i+'bias']= torch.from_numpy(np.load(weight_folder+name+i+'.bias.npy')).to(device)
     #print('done with '+name+i)
 
 
@@ -142,8 +153,10 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         #define lower bound and upper bound of each linear layer output
         x_ub = inputs.to(device) + epsilon_input
         x_lb = inputs.to(device) - epsilon_input
-        bounds = net.module.linear_bound(torch.cat([x_ub, x_lb], 0), epsilon_weight, epsilon_bias, epsilon_activation)
-        # check bounds
+        if device == 'cuda': 
+            bounds = net.module.linear_bound(torch.cat([x_ub, x_lb], 0), epsilon_weight, epsilon_bias, epsilon_activation)
+        else: 
+            bounds = net.linear_bound(torch.cat([x_ub, x_lb], 0), epsilon_weight, epsilon_bias, epsilon_activation)        # check bounds
         #print(len(bounds))
         # for i, (ub, lb) in enumerate(bounds):
         #     print(f"Bound {i} upper_bound shape: {ub.shape}")
@@ -402,8 +415,8 @@ model_dictionary = {}
 # load trained weights and biases in model_dictionary
 name = 'linear_layers'
 for i in ['1', '2', '3', '4', '5']: 
-    model_dictionary[name+i+'weight'] = torch.from_numpy(np.load(weight_folder+name+i+'.weight.npy')).cuda()
-    model_dictionary[name+i+'bias']= torch.from_numpy(np.load(weight_folder+name+i+'.bias.npy')).cuda()
+    model_dictionary[name+i+'weight'] = torch.from_numpy(np.load(weight_folder+name+i+'.weight.npy')).to(device)
+    model_dictionary[name+i+'bias']= torch.from_numpy(np.load(weight_folder+name+i+'.bias.npy')).to(device)
     #print('done with '+name+i)
 
 
@@ -487,8 +500,10 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         #define lower bound and upper bound of each linear layer output
         x_ub = inputs.to(device) + epsilon_input
         x_lb = inputs.to(device) - epsilon_input
-        bounds = net.module.linear_bound(torch.cat([x_ub, x_lb], 0), epsilon_weight, epsilon_bias, epsilon_activation)
-        # check bounds
+        if device == 'cuda': 
+            bounds = net.module.linear_bound(torch.cat([x_ub, x_lb], 0), epsilon_weight, epsilon_bias, epsilon_activation)
+        else: 
+            bounds = net.linear_bound(torch.cat([x_ub, x_lb], 0), epsilon_weight, epsilon_bias, epsilon_activation)        # check bounds
         #print(len(bounds))
         # for i, (ub, lb) in enumerate(bounds):
         #     print(f"Bound {i} upper_bound shape: {ub.shape}")
