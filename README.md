@@ -1,13 +1,12 @@
 # Certifiably Quantisation-Robust training and inference of Neural Networks
 We address the problem of computing the worst-case discrepancy between the original neural network and the quantized one over a finite test dataset. To achieve this, we first reformulate the problem in terms of bilinear optimization and use the Gurobi solver to solve it. Currently, we are experimenting with this method on 16 different models across 50 images from the MNIST test set.
 
-## How to Run the Program computing the worst-case discrepancy
+## 1. How to Run the Program computing the worst-case discrepancy
 
 Follow the steps below to run the experiments:
 
 ### Step 1: Add Gurobi License
-1. Open the `licenses` folder and add the `gurobi_2.lic` file to your root directory (examples for Windows: C:\Users\hueda\gurobi.lic).
-   - This is the default directory where Gurobi will search for the license.
+1. Open the `licenses` folder and download `gurobi_2.lic` file, rename as 'gurobi.lic" to your root directory (examples for Windows: C:\Users\hueda\gurobi.lic) becuase this is the default directory where Gurobi will search for the license.
 
 ### Step 2: Navigate to the Verification Folder
 1. Move to the verification directory:
@@ -44,10 +43,11 @@ To optimize execution time, you can run multiple `.py` files in parallel using d
    ```
 The file_name values are defined in the run_experiments.sh file mentioned above.
 
-## How to Run the Program verifying the robustness of a model against quantization 
+## 2. How to Run the Program verifying the robustness of a model against quantization 
+Do step 1 and step 2 above.
 Run the `run_verification.sh` file:
  ```bash
- ./run_experiments.sh
+ ./run_verification.sh
  ```
 The program will sequentially execute 4 .py files to test the robust accuracy of robust models and the normal one with epsilon equivalent to the perturbation of 6 bits, 8 bits, 10 bits, 16 bits quantization.
 
