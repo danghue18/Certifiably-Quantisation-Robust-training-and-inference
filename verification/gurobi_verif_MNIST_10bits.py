@@ -33,7 +33,7 @@ transform_test = transforms.Compose([
 
 testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
 
-indices = list(range(0, 100))
+indices = list(range(4, 100))
 testloader = torch.utils.data.DataLoader(testset, batch_size=1, sampler=indices, num_workers=2)
 # testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
 
@@ -282,10 +282,17 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         # Optimize m
         model_gurobi.setObjective(m, GRB.MINIMIZE)
         optimization_status = optimize_with_timeout(model_gurobi, timeout)
+
         if not optimization_status:  
             non_robust_count += 1
             time_exceed += 1
             total += 1
+            print(f"*************Verified robust accuracy with ep_i = {epsilon_input}, ep_w = {epsilon_weight}, ep_b = {epsilon_bias},ep_a = {epsilon_activation}: {robust_count}/{total} ({accuracy:.2f}%)")
+
+            result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 
+             'Total': total, 'robust': robust_count, 'non-robust': non_robust_count, 'time exceed': time_exceed }
+            path = f'opt_results/exp19.xlsx'
+            DictExcelSaver.save(result,path)
             continue 
 
         # Verify
