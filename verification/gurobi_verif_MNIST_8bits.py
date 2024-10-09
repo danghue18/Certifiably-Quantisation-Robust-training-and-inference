@@ -289,7 +289,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
             print(f"*************Verified robust accuracy with ep_i = {epsilon_input}, ep_w = {epsilon_weight}, ep_b = {epsilon_bias},ep_a = {epsilon_activation}: {robust_count}/{total} ({accuracy:.2f}%)")
             result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 
              'Total': total, 'robust': robust_count, 'non-robust': non_robust_count, 'time exceed': time_exceed }
-            path = f'opt_results/exp19.xlsx'
+            path = f'opt_results/exp18.xlsx'
             DictExcelSaver.save(result,path)           
             continue 
 

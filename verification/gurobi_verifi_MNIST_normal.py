@@ -290,7 +290,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
 
             result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 
              'Total': total, 'robust': robust_count, 'non-robust': non_robust_count, 'time exceed': time_exceed }
-            path = f'opt_results/exp19.xlsx'
+            path = f'opt_results/exp21_normal_{epsilon_weight}.xlsx'
             DictExcelSaver.save(result,path)
             continue 
 
@@ -320,7 +320,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         
         result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 
                   'Total': total, 'robust': robust_count, 'non-robust': non_robust_count, 'time exceed': time_exceed }
-        path = f'opt_results/exp21_normal_{epsilon_input}.xlsx'
+        path = f'opt_results/exp21_normal_{epsilon_weight}.xlsx'
         DictExcelSaver.save(result,path)
 
 
@@ -330,11 +330,11 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
     print("Numer of time out samples: ",time_exceed)
     result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 
              'Total': total, 'robust': robust_count, 'non-robust': non_robust_count, 'time exceed': time_exceed }
-    path = f'opt_results/exp21_normal_{epsilon_input}.xlsx'
+    path = f'opt_results/exp21_normal_{epsilon_weight}.xlsx'
     DictExcelSaver.save(result,path)
 
 if __name__ == '__main__':
     #test_robustness(model_dictionary,net, testloader, epsilon_input=1/64, epsilon_weight=1/32, epsilon_bias=1/32, epsilon_activation=1/32, timeout=3600)
-    test_robustness(model_dictionary,net, testloader, epsilon_input=1/256, epsilon_weight=1/128, epsilon_bias=1/128, epsilon_activation=1/128, timeout=3600)
+    test_robustness(model_dictionary,net, testloader, epsilon_input=0, epsilon_weight=1/128, epsilon_bias=1/128, epsilon_activation=0, timeout=3600)
     #test_robustness(model_dictionary,net, testloader, epsilon_input=1/1024, epsilon_weight=1/512, epsilon_bias=1/512, epsilon_activation=1/512, timeout=3600)
     #test_robustness(model_dictionary,net, testloader, epsilon_input=1/65536, epsilon_weight=1/32768, epsilon_bias=1/32768, epsilon_activation=1/32768, timeout=3600)
