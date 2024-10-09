@@ -43,7 +43,7 @@ if device == 'cuda':
 net = net.to(device)
 
 # Load checkpoint.
-checkpoint = torch.load(r'C:\Users\hueda\Documents\Model_robust_weight_perturbation\interval_bound_propagation\checkpoint\test_eps_k_0.5\fixed_eps_2_255.pth')
+checkpoint = torch.load(r'C:\Users\hueda\Documents\Model_robust_weight_perturbation\interval_bound_propagation\checkpoint\MNIST\test_eps_k_0.5\fixed_eps_2_255.pth')
 net.load_state_dict(checkpoint['net'])
 
 #load weight files
@@ -269,4 +269,4 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
     print("Numer of time out samples: ",time_exceed)
     
 if __name__ == '__main__':
-    test_robustness(model_dictionary,net, testloader, epsilon_input=0, epsilon_weight=2/255, epsilon_bias=2/255, epsilon_activation=0, timeout=600)
+    test_robustness(model_dictionary,net, testloader, epsilon_input=2/255, epsilon_weight=0, epsilon_bias=0, epsilon_activation=0, timeout=600)

@@ -246,11 +246,11 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
             # print("----Output upper bound:", upper_bound3[0,i].item())
             model_gurobi.addConstr(output[i] <= upper_bound4[0,i].item())
 
-        orig_outputs = net(torch.cat([inputs.to(device),inputs.to(device)], 0))
-        value_fl_batch = orig_outputs[:orig_outputs .shape[0]//2]
-        value_fl_batch = F.softmax(value_fl_batch, dim=1)
-        #print(value_fl_batch.shape)
-        orig_output = value_fl_batch[0][labels].item() # output of true class
+        # orig_outputs = net(torch.cat([inputs.to(device),inputs.to(device)], 0))
+        # value_fl_batch = orig_outputs[:orig_outputs .shape[0]//2]
+        # value_fl_batch = F.softmax(value_fl_batch, dim=1)
+        # #print(value_fl_batch.shape)
+        # orig_output = value_fl_batch[0][labels].item() # output of true class
 
 
         num_classes = 10
@@ -306,19 +306,23 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         worst_case[0, labels] = min_output[0, labels]  # Replace the true class logit with the min value
         worst = (F.softmax(worst_case, dim=1))[0, labels].item()  # Compute softmax and get value for true class
 
-        diff =  max(best - orig_output, orig_output - worst)
-        #diff =  max(outputs_ub[0,targets] - orig_output, orig_output - outputs_lb[0,targets])
-        if diff > worst_case_dis: 
-            worst_case_dis = diff
+        # diff =  max(best - orig_output, orig_output - worst)
+        # #diff =  max(outputs_ub[0,targets] - orig_output, orig_output - outputs_lb[0,targets])
+        # if diff > worst_case_dis: 
+        #     worst_case_dis = diff
+        result = {'Best ': best, 'Worst ': worst }
+        path = f'opt_results/exp5_sample{batch_idx+1}.xlsx'
+        DictExcelSaver.save(result,path)
         total += 1
         end_time = time.time()
         execution_time = end_time - start_time  
         print(f"Processed sample {batch_idx} in {execution_time:.2f} seconds.")
-        print(f'---------------done {total} samples, worst case discrepancy found is {worst_case_dis}')    
+    #     print(f'---------------done {total} samples, worst case discrepancy found is {worst_case_dis}')    
 
-    print(f"*************Worst case discrepancy with ep_i = {epsilon_input}, ep_w = {epsilon_weight}, ep_b = {epsilon_bias},ep_a = {epsilon_activation}: {worst_case_dis}")
-    result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 'Worst case discrepancy': worst_case_dis }
-    path = f'opt_results/exp5.xlsx'
-    DictExcelSaver.save(result,path)
+    # print(f"*************Worst case discrepancy with ep_i = {epsilon_input}, ep_w = {epsilon_weight}, ep_b = {epsilon_bias},ep_a = {epsilon_activation}: {worst_case_dis}")
+    # result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 'Worst case discrepancy': worst_case_dis }
+    # path = f'opt_results/exp5.xlsx'
+    # DictExcelSaver.save(result,path)
 if __name__ == '__main__':
     test_robustness(model_dictionary,net, testloader, epsilon_input=1/1023, epsilon_weight=1/1023, epsilon_bias=1/1023, epsilon_activation=1/1023)
+# ---------------done 2 samples, worst case discrepancy found is 0.004274725914001465
