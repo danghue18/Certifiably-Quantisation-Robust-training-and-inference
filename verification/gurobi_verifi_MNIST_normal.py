@@ -33,7 +33,7 @@ transform_test = transforms.Compose([
 
 testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
 
-indices = list(range(0, 100))
+indices = list(range(3, 100))
 testloader = torch.utils.data.DataLoader(testset, batch_size=1, sampler=indices, num_workers=2)
 # testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
 
@@ -328,7 +328,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
     DictExcelSaver.save(result,path)
 
 if __name__ == '__main__':
-    test_robustness(model_dictionary,net, testloader, epsilon_input=1/64, epsilon_weight=1/32, epsilon_bias=1/32, epsilon_activation=1/32, timeout=3600)
+    #test_robustness(model_dictionary,net, testloader, epsilon_input=1/64, epsilon_weight=1/32, epsilon_bias=1/32, epsilon_activation=1/32, timeout=3600)
     test_robustness(model_dictionary,net, testloader, epsilon_input=1/256, epsilon_weight=1/128, epsilon_bias=1/128, epsilon_activation=1/128, timeout=3600)
-    test_robustness(model_dictionary,net, testloader, epsilon_input=1/1024, epsilon_weight=1/512, epsilon_bias=1/512, epsilon_activation=1/512, timeout=3600)
-    test_robustness(model_dictionary,net, testloader, epsilon_input=1/65536, epsilon_weight=1/32768, epsilon_bias=1/32768, epsilon_activation=1/32768, timeout=3600)
+    #test_robustness(model_dictionary,net, testloader, epsilon_input=1/1024, epsilon_weight=1/512, epsilon_bias=1/512, epsilon_activation=1/512, timeout=3600)
+    #test_robustness(model_dictionary,net, testloader, epsilon_input=1/65536, epsilon_weight=1/32768, epsilon_bias=1/32768, epsilon_activation=1/32768, timeout=3600)
