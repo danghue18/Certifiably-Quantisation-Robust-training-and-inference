@@ -336,5 +336,5 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
 if __name__ == '__main__':
     # test_robustness(model_dictionary,net, testloader, epsilon_input=0, epsilon_weight=1/32, epsilon_bias=1/32, epsilon_activation=0, timeout=1800)
     # test_robustness(model_dictionary,net, testloader, epsilon_input=0, epsilon_weight=1/128, epsilon_bias=1/128, epsilon_activation=0, timeout=1800)
-    # test_robustness(model_dictionary,net, testloader, epsilon_input=0, epsilon_weight=1/512, epsilon_bias=1/512, epsilon_activation=0, timeout=1800)
-    test_robustness(model_dictionary,net, testloader, epsilon_input=0, epsilon_weight=1/32768, epsilon_bias=1/32768, epsilon_activation=0, timeout=1800)
+    test_robustness(model_dictionary,net, testloader, epsilon_input=0, epsilon_weight=1/512, epsilon_bias=1/512, epsilon_activation=0, timeout=1800)
+    #test_robustness(model_dictionary,net, testloader, epsilon_input=0, epsilon_weight=1/32768, epsilon_bias=1/32768, epsilon_activation=0, timeout=1800)

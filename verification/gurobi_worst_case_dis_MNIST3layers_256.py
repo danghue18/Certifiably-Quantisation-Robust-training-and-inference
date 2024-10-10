@@ -33,7 +33,7 @@ transform_test = transforms.Compose([
 
 testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
 
-indices = list(range(0, 50))
+indices = list(range(0, 30))
 testloader = torch.utils.data.DataLoader(testset, batch_size=1, sampler=indices, num_workers=2)
 # testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
 
@@ -62,6 +62,7 @@ else:
             new_key = key
         new_state_dict[new_key] = value
     net.load_state_dict(new_state_dict)
+
 
 #load weight files
 model_dictionary = {}
@@ -127,7 +128,6 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
             model_gurobi.addConstr(bias3[i] >= model_dictionary[name+'3bias'][i].item() - epsilon_bias, f"b3_lower_{i}")
             model_gurobi.addConstr(bias3[i] <= model_dictionary[name+'3bias'][i].item() + epsilon_bias, f"b3_upper_{i}")
         #print("----------------done constraints for input, weights, bias")
-        
         # check loaded weights
         # print(f"Weight1[19]: {model_dictionary['linear_layers1weight'][19]}")
         # print(f"Bias1[19]: {model_dictionary['linear_layers1bias'][19].item()}")
@@ -138,7 +138,8 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         if device == 'cuda': 
             bounds = net.module.linear_bound(torch.cat([x_ub, x_lb], 0), epsilon_weight, epsilon_bias, epsilon_activation)
         else: 
-            bounds = net.linear_bound(torch.cat([x_ub, x_lb], 0), epsilon_weight, epsilon_bias, epsilon_activation)        # check bounds
+            bounds = net.linear_bound(torch.cat([x_ub, x_lb], 0), epsilon_weight, epsilon_bias, epsilon_activation)
+        # check bounds
         #print(len(bounds))
         # for i, (ub, lb) in enumerate(bounds):
         #     print(f"Bound {i} upper_bound shape: {ub.shape}")
@@ -213,21 +214,24 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
             model_gurobi.addConstr(output[i] <= upper_bound3[0,i].item())
 
         # orig_outputs = net(torch.cat([inputs.to(device),inputs.to(device)], 0))
-        # print(orig_outputs.shape)
         # value_fl_batch = orig_outputs[:orig_outputs .shape[0]//2]
         # value_fl_batch = F.softmax(value_fl_batch, dim=1)
-        # print(value_fl_batch.shape)
+        # #print(value_fl_batch.shape)
         # orig_output = value_fl_batch[0][labels].item() # output of true class
-        # print(orig_output)
 
         num_classes = 10
         min_output = []
         max_output = []
+        min_outputs = []
+        max_outputs = []
+        best_list = []
+        worst_list = []
         # Find the maximum value of each logit
         for i in range(num_classes): 
             M = model_gurobi.addVar(lb=-GRB.INFINITY, ub=GRB.INFINITY, name=f"M_class_{i}")
             model_gurobi.addConstr(M == output[i])
             model_gurobi.setObjective(M, GRB.MAXIMIZE)
+            model_gurobi.Params.TimeLimit = 1200
             model_gurobi.optimize()
             # Check if the optimization was successful
             if model_gurobi.status == GRB.OPTIMAL:
@@ -245,6 +249,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
             m = model_gurobi.addVar(lb=-GRB.INFINITY, ub=GRB.INFINITY, name=f"m_class_{i}")
             model_gurobi.addConstr(m == output[i])
             model_gurobi.setObjective(m, GRB.MINIMIZE)
+            model_gurobi.Params.TimeLimit = 1200
             model_gurobi.optimize()
             
             # Check if the optimization was successful
@@ -264,6 +269,8 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
              
         min_output = torch.tensor(min_output).unsqueeze(0)  # Shape: (1, 10)
         max_output = torch.tensor(max_output).unsqueeze(0)  # Shape: (1, 10)
+        print(max_output.shape)
+        print(min_output.shape)
 
         best_case = min_output.clone() 
         best_case[0, labels] = max_output[0, labels]  # Replace the true class logit with the max value
@@ -277,9 +284,17 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         # #diff =  max(outputs_ub[0,targets] - orig_output, orig_output - outputs_lb[0,targets])
         # if diff > worst_case_dis: 
         #     worst_case_dis = diff
-        result = {'Best ': best, 'Worst ': worst }
-        path = f'opt_results/exp3_sample{batch_idx+1}.xlsx'
-        DictExcelSaver.save(result,path)
+        # result = {'Best ': best, 'Worst ': worst, 'original output': orig_output}
+        # path = f'opt_results/exp2_sample{batch_idx+1}.xlsx'
+        # DictExcelSaver.save(result,path)
+        min_outputs.append(min_output)
+        max_outputs.append(max_output)
+        best_list.append(best)
+        worst_list.append(worst)
+        np.save('opt_results/exp3_min_logs', min_outputs) 
+        np.save('opt_results/exp3_max_logs',max_outputs)
+        np.save( 'opt_results/exp3_best_logs', best_list) 
+        np.save( 'opt_results/exp3_worst_logs', worst_list) 
         total += 1
         end_time = time.time()
         execution_time = end_time - start_time  
@@ -287,9 +302,9 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         #print(f'---------------done {total} samples, worst case discrepancy found is {worst_case_dis}')
         
 
-    # print(f"*************Worst case discrepancy with ep_i = {epsilon_input}, ep_w = {epsilon_weight}, ep_b = {epsilon_bias},ep_a = {epsilon_activation}: {worst_case_dis}")
-    # result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 'Worst case discrepancy': worst_case_dis }
-    # path = f'opt_results/exp3.xlsx'
-    # DictExcelSaver.save(result,path)
+    print(f"*************Worst case discrepancy with ep_i = {epsilon_input}, ep_w = {epsilon_weight}, ep_b = {epsilon_bias},ep_a = {epsilon_activation}: {worst_case_dis}")
+    result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 'Worst case discrepancy': worst_case_dis }
+    path = f'opt_results/exp3.xlsx'
+    DictExcelSaver.save(result,path)
 if __name__ == '__main__':
     test_robustness(model_dictionary,net, testloader, epsilon_input=1/1023, epsilon_weight=1/1023, epsilon_bias=1/1023, epsilon_activation=1/1023)

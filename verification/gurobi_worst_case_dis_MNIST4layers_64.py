@@ -32,7 +32,7 @@ transform_test = transforms.Compose([
 
 testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
 
-indices = list(range(0, 50))
+indices = list(range(0, 30))
 testloader = torch.utils.data.DataLoader(testset, batch_size=1, sampler=indices, num_workers=2)
 # testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
 
@@ -256,11 +256,16 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         num_classes = 10
         min_output = []
         max_output = []
+        min_outputs = []
+        max_outputs = []
+        best_list = []
+        worst_list = []
         # Find the maximum value of each logit
         for i in range(num_classes): 
             M = model_gurobi.addVar(lb=-GRB.INFINITY, ub=GRB.INFINITY, name=f"M_class_{i}")
             model_gurobi.addConstr(M == output[i])
             model_gurobi.setObjective(M, GRB.MAXIMIZE)
+            model_gurobi.Params.TimeLimit = 1200
             model_gurobi.optimize()
             # Check if the optimization was successful
             if model_gurobi.status == GRB.OPTIMAL:
@@ -278,6 +283,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
             m = model_gurobi.addVar(lb=-GRB.INFINITY, ub=GRB.INFINITY, name=f"m_class_{i}")
             model_gurobi.addConstr(m == output[i])
             model_gurobi.setObjective(m, GRB.MINIMIZE)
+            model_gurobi.Params.TimeLimit = 1200
             model_gurobi.optimize()
             
             # Check if the optimization was successful
@@ -310,9 +316,17 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         # #diff =  max(outputs_ub[0,targets] - orig_output, orig_output - outputs_lb[0,targets])
         # if diff > worst_case_dis: 
         #     worst_case_dis = diff
-        result = {'Best ': best, 'Worst ': worst }
-        path = f'opt_results/exp5_sample{batch_idx+1}.xlsx'
-        DictExcelSaver.save(result,path)
+        # result = {'Best ': best, 'Worst ': worst }
+        # path = f'opt_results/exp5_sample{batch_idx+1}.xlsx'
+        # DictExcelSaver.save(result,path)
+        min_outputs.append(min_output)
+        max_outputs.append(max_output)
+        best_list.append(best)
+        worst_list.append(worst)
+        np.save('opt_results/exp5_min_logs', min_outputs) 
+        np.save('opt_results/exp5_max_logs',max_outputs)
+        np.save( 'opt_results/exp5_best_logs', best_list) 
+        np.save( 'opt_results/exp5_worst_logs', worst_list) 
         total += 1
         end_time = time.time()
         execution_time = end_time - start_time  

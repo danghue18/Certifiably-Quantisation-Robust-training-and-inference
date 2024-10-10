@@ -153,8 +153,10 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         #define lower bound and upper bound of each linear layer output
         x_ub = inputs.to(device) + epsilon_input
         x_lb = inputs.to(device) - epsilon_input
-        bounds = net.module.linear_bound(torch.cat([x_ub, x_lb], 0), epsilon_weight, epsilon_bias, epsilon_activation)
-        # check bounds
+        if device == 'cuda': 
+            bounds = net.module.linear_bound(torch.cat([x_ub, x_lb], 0), epsilon_weight, epsilon_bias, epsilon_activation)
+        else: 
+            bounds = net.linear_bound(torch.cat([x_ub, x_lb], 0), epsilon_weight, epsilon_bias, epsilon_activation)        # check bounds
         #print(len(bounds))
         # for i, (ub, lb) in enumerate(bounds):
         #     print(f"Bound {i} upper_bound shape: {ub.shape}")

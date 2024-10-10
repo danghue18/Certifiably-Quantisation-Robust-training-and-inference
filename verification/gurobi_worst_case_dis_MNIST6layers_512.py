@@ -365,7 +365,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
                 model_gurobi.write(f"model_class_{i}_infeasible.ilp")
 
         # Find the minimum value for each logit
-        for i in range(num_classes): 
+        for i in range(1): 
             m = model_gurobi.addVar(lb=-GRB.INFINITY, ub=GRB.INFINITY, name=f"m_class_{i}")
             model_gurobi.addConstr(m == output[i])
             model_gurobi.setObjective(m, GRB.MINIMIZE)
