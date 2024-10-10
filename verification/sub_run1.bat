@@ -1,4 +1,0 @@
-@echo off
-python gurobi_worst_case_dis_MNIST3layers_128.py 
-python gurobi_worst_case_dis_MNIST3layers_256.py 
-pause
