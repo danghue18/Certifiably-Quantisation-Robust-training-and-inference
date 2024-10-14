@@ -265,7 +265,6 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
             M = model_gurobi.addVar(lb=-GRB.INFINITY, ub=GRB.INFINITY, name=f"M_class_{i}")
             model_gurobi.addConstr(M == output[i])
             model_gurobi.setObjective(M, GRB.MAXIMIZE)
-            model_gurobi.Params.TimeLimit = 60
             model_gurobi.optimize()
             # Check if the optimization was successful
             if model_gurobi.status == GRB.OPTIMAL:
@@ -283,7 +282,6 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
             m = model_gurobi.addVar(lb=-GRB.INFINITY, ub=GRB.INFINITY, name=f"m_class_{i}")
             model_gurobi.addConstr(m == output[i])
             model_gurobi.setObjective(m, GRB.MINIMIZE)
-            model_gurobi.Params.TimeLimit = 60
             model_gurobi.optimize()
             
             # Check if the optimization was successful
@@ -303,7 +301,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
              
         min_output = torch.tensor(min_output).unsqueeze(0)  # Shape: (1, 10)
         max_output = torch.tensor(max_output).unsqueeze(0)  # Shape: (1, 10)
-        labels = 0
+
         best_case = min_output.clone() 
         best_case[0, labels] = max_output[0, labels]  # Replace the true class logit with the max value
         best = (F.softmax(best_case, dim=1))[0, labels].item()  # Compute softmax and get value for true class
