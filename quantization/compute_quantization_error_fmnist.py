@@ -57,16 +57,16 @@ net = net.to(device)
 if device == 'cuda':
     net = torch.nn.DataParallel(net)
     cudnn.benchmark = True
-
+round = 7
 print('==> load full precision model.')
-checkpoint = torch.load(r'C:\Users\hueda\Documents\Model_robust_weight_perturbation\interval_bound_propagation\checkpoint\FMNIST\running_eps_7_255.pth')
+checkpoint = torch.load(f'C:/Users/hueda/Documents/Model_robust_weight_perturbation/interval_bound_propagation/checkpoint/FMNIST/normal.pth')
 net.load_state_dict(checkpoint['net'])
 
 
 
 #load numpy files
 model_dictionary = {}
-model_name = 'FMNIST/running_7_255/'
+model_name = f'FMNIST/normal/'
 folder_name = 'extracted_params/'+model_name
 
 name = 'linear_layers'
@@ -134,11 +134,13 @@ if __name__ == '__main__':
     freeze_support()
     fl_model_outputs = []
     ground_truth = []
+    all_labels = []
     fx_model_outputs_list = []
     
     with torch.no_grad():
         for batch_idx, (inputs, targets) in enumerate(testloader):
             ground_truth += targets.tolist()
+            all_labels.append(targets)
             inputs, targets = inputs.to(device), targets.to(device)
 
             # value_fl_batch = feedforward(inputs,model_dictionary,32,32,32,32)
@@ -148,7 +150,9 @@ if __name__ == '__main__':
             value_fl_batch = F.softmax(value_fl_batch, dim=1)
             #print(value_fl_batch)
             fl_model_outputs.append(value_fl_batch) # shape: batch x 10
-        
+    all_labels = torch.cat(all_labels)
+    all_labels = all_labels.numpy()
+    print(all_labels)
     fl_model_outputs = torch.cat(fl_model_outputs).cpu()
     print((np.array(fl_model_outputs)).shape)
 
@@ -190,15 +194,18 @@ if __name__ == '__main__':
         # print(fx_model_outputs.shape)
         # print(fl_model_outputs.shape)
         print((fx_model_outputs - fl_model_outputs).shape) # 10k x 10
-        print(torch.norm(fx_model_outputs - fl_model_outputs, p=float('inf'), dim=1).shape) # 10k x 1
-        l_inf = torch.max(torch.norm(fx_model_outputs - fl_model_outputs, p=float('inf'), dim=1))
+        diff = abs(fx_model_outputs - fl_model_outputs) #10k x 10
+        worst_case_dis = max(diff[np.arange(diff.shape[0]), all_labels])
+        l_inf_list.append(worst_case_dis)
+        # print(torch.norm(fx_model_outputs - fl_model_outputs, p=float('inf'), dim=1).shape) # 10k x 1
+        # l_inf = torch.max(torch.norm(fx_model_outputs - fl_model_outputs, p=float('inf'), dim=1))
         #l_inf = torch.max(torch.norm(fx_model_outputs - fl_model_outputs, p=1, dim=1))
-        l_inf_list.append(float(l_inf))
+        #l_inf_list.append(float(l_inf))
 
     
 
     result = {'Bx ': Bx_list, 'Bx ': Bx_list, 'Bb ': Bb_list, 'Ba ': Ba_list, 'Quantize_accuracy': acc_fx_list, 'Quantization_error':l_inf_list }
-    path = f'quantization_results/FMNIST/v2_bound_quantization_error_norm_inf_4_in_4_act_7_255.xlsx'
+    path = f'quantization_results/FMNIST/v2_bound_quantization_error_norm_inf_4_in_4_act_new_normal.xlsx'
     DictExcelSaver.save(result,path)
 
  

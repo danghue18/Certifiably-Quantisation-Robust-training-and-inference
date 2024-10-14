@@ -282,14 +282,15 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         # Optimize m
         model_gurobi.setObjective(m, GRB.MINIMIZE)
         optimization_status = optimize_with_timeout(model_gurobi, timeout)
-
         if not optimization_status:  
             non_robust_count += 1
             time_exceed += 1
             total += 1
+            print(f'---------------done {total} samples, robust: {robust_count}, non-robust: {non_robust_count} with {time_exceed} time exceeded samples ')
+            
             result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 
-             'Total': total, 'robust': robust_count, 'non-robust': non_robust_count, 'time exceed': time_exceed }
-            path = f'opt_results/exp19.xlsx'
+                    'Total': total, 'robust': robust_count, 'non-robust': non_robust_count, 'time exceed': time_exceed }
+            path = f'opt_results/exp19_{epsilon_input}_{epsilon_weight}_{epsilon_activation}.xlsx'
             DictExcelSaver.save(result,path)
             continue 
 
@@ -319,18 +320,9 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         
         result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 
                   'Total': total, 'robust': robust_count, 'non-robust': non_robust_count, 'time exceed': time_exceed }
-        path = f'opt_results/exp19.xlsx'
+        path = f'opt_results/exp19_{epsilon_input}_{epsilon_weight}_{epsilon_activation}.xlsx'
         DictExcelSaver.save(result,path)
 
-
-    accuracy = 100 * (robust_count) / (total)
-    print(f"*************Verified robust accuracy with ep_i = {epsilon_input}, ep_w = {epsilon_weight}, ep_b = {epsilon_bias},ep_a = {epsilon_activation}: {robust_count}/{total} ({accuracy:.2f}%)")
-    print(f"Non-robust samples: {non_robust_count}/{total} ({(100 - accuracy):.2f}%)")
-    print("Numer of time out samples: ",time_exceed)
-    result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 
-             'Total': total, 'robust': robust_count, 'non-robust': non_robust_count, 'time exceed': time_exceed }
-    path = f'opt_results/exp19.xlsx'
-    DictExcelSaver.save(result,path)
-
 if __name__ == '__main__':
-    test_robustness(model_dictionary,net, testloader, epsilon_input=0, epsilon_weight=1/512, epsilon_bias=1/512, epsilon_activation=0, timeout=1800)
+    #10s bits
+    test_robustness(model_dictionary,net, testloader, epsilon_input=1/1024, epsilon_weight=1/512, epsilon_bias=1/512, epsilon_activation=1/512, timeout=1800)

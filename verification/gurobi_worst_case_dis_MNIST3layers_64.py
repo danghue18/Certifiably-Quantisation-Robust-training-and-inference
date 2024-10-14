@@ -33,7 +33,7 @@ transform_test = transforms.Compose([
 
 testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
 
-indices = list(range(23, 30))
+indices = list(range(24, 50))
 testloader = torch.utils.data.DataLoader(testset, batch_size=1, sampler=indices, num_workers=2)
 # testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
 
@@ -231,7 +231,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
             M = model_gurobi.addVar(lb=-GRB.INFINITY, ub=GRB.INFINITY, name=f"M_class_{i}")
             model_gurobi.addConstr(M == output[i])
             model_gurobi.setObjective(M, GRB.MAXIMIZE)
-            model_gurobi.Params.TimeLimit = 1200
+            model_gurobi.Params.TimeLimit = 120
             model_gurobi.optimize()
             # Check if the optimization was successful
             if model_gurobi.status == GRB.OPTIMAL:
@@ -249,7 +249,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
             m = model_gurobi.addVar(lb=-GRB.INFINITY, ub=GRB.INFINITY, name=f"m_class_{i}")
             model_gurobi.addConstr(m == output[i])
             model_gurobi.setObjective(m, GRB.MINIMIZE)
-            model_gurobi.Params.TimeLimit = 1200
+            model_gurobi.Params.TimeLimit = 120
             model_gurobi.optimize()
             
             # Check if the optimization was successful
@@ -273,6 +273,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         print(min_output.shape)
 
         best_case = min_output.clone() 
+        labels = 0
         best_case[0, labels] = max_output[0, labels]  # Replace the true class logit with the max value
         best = (F.softmax(best_case, dim=1))[0, labels].item()  # Compute softmax and get value for true class
 

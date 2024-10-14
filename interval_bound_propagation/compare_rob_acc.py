@@ -50,16 +50,18 @@ trainset = torchvision.datasets.MNIST(root='\datasets', train=True, download=Tru
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=100, shuffle=False, num_workers=2)
 
 testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
-testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
+indices = list(range(0, 1000))
+testloader = torch.utils.data.DataLoader(testset, batch_size=100, sampler=indices, num_workers=2)
+#testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
 
 #classes = ('0','1','2','3','4','5','6','7','8','9')
 
 #Model
 print('==> Building model..')
 n_hidden_nodes = 256
-net =  MNIST_6layers(
-    non_negative = [False, False, False,False, False, False], 
-    norm = [False, False, False, False, False, False], 
+net =  MNIST_4layers(
+    non_negative = [False, False, False,False], 
+    norm = [False, False, False, False], 
     n_hidden_nodes=n_hidden_nodes )
 net = net.to(device)
 
@@ -243,83 +245,83 @@ def main():
 
     print('Evaluate robust model: ')
     # Load checkpoint.
-    checkpoint_path = f'./checkpoint/MNIST/robust_6_layers_{n_hidden_nodes}_2_255.pth'
+    checkpoint_path = f'./checkpoint/MNIST/robust_4_layers_256_10bits.pth'
     checkpoint = torch.load(checkpoint_path)
     net.load_state_dict(checkpoint['net'])
 
     print_accuracy(net, trainloader, testloader, device, test=True, 
-                                                                                ep_i =2/255, 
-                                                                                ep_w = 2/255,
-                                                                                ep_b = 2/255,
-                                                                                ep_a = 2/255)
-    print_accuracy(net, trainloader, testloader, device, test=True, 
-                                                                                ep_i =1/16, 
-                                                                                ep_w = 1/8,
-                                                                                ep_b = 1/8,
-                                                                                ep_a = 1/8)
-    #eps_list = [0, 1/255, 2/255, 3/255, 3/255]
-    step = 0.03/20
-    for i in range(21):
-        eps = step * i
-        eps_list.append(eps)
-        acc_rob_input, _ = print_accuracy(net, trainloader, testloader, device, test=True, 
-                                                                                ep_i =eps, 
-                                                                                ep_w = 0,
-                                                                                ep_b = 0,
+                                                                                ep_i =0, 
+                                                                                ep_w = 1/512,
+                                                                                ep_b = 1/512,
                                                                                 ep_a = 0)
-        acc_rob_input_list.append(acc_rob_input)
+    # print_accuracy(net, trainloader, testloader, device, test=True, 
+    #                                                                             ep_i =1/16, 
+    #                                                                             ep_w = 1/8,
+    #                                                                             ep_b = 1/8,
+    #                                                                             ep_a = 1/8)
+    # #eps_list = [0, 1/255, 2/255, 3/255, 3/255]
+    # step = 0.03/20
+    # for i in range(21):
+    #     eps = step * i
+    #     eps_list.append(eps)
+    #     acc_rob_input, _ = print_accuracy(net, trainloader, testloader, device, test=True, 
+    #                                                                             ep_i =eps, 
+    #                                                                             ep_w = 0,
+    #                                                                             ep_b = 0,
+    #                                                                             ep_a = 0)
+    #     acc_rob_input_list.append(acc_rob_input)
         
-        acc_rob_param, _ = print_accuracy(net, trainloader, testloader, device, test=True, 
-                                                                                ep_i =0, 
-                                                                                ep_w = eps,
-                                                                                ep_b = eps,
-                                                                                ep_a = 0)
-        acc_rob_param_list.append(acc_rob_param)
+    #     acc_rob_param, _ = print_accuracy(net, trainloader, testloader, device, test=True, 
+    #                                                                             ep_i =0, 
+    #                                                                             ep_w = eps,
+    #                                                                             ep_b = eps,
+    #                                                                             ep_a = 0)
+    #     acc_rob_param_list.append(acc_rob_param)
 
-        acc_rob_act, _ = print_accuracy(net, trainloader, testloader, device, test=True, 
-                                                                                ep_i =0, 
-                                                                                ep_w = 0,
-                                                                                ep_b = 0,
-                                                                                ep_a = eps)
-        acc_rob_act_list.append(acc_rob_act)  
+    #     acc_rob_act, _ = print_accuracy(net, trainloader, testloader, device, test=True, 
+    #                                                                             ep_i =0, 
+    #                                                                             ep_w = 0,
+    #                                                                             ep_b = 0,
+    #                                                                             ep_a = eps)
+    #     acc_rob_act_list.append(acc_rob_act)  
 
-        acc_rob_input_act, _ = print_accuracy(net, trainloader, testloader, device, test=True, 
-                                                                                ep_i =eps, 
-                                                                                ep_w = 0,
-                                                                                ep_b = 0,
-                                                                                ep_a = eps)
-        acc_rob_input_act_list.append(acc_rob_input_act) 
+    #     acc_rob_input_act, _ = print_accuracy(net, trainloader, testloader, device, test=True, 
+    #                                                                             ep_i =eps, 
+    #                                                                             ep_w = 0,
+    #                                                                             ep_b = 0,
+    #                                                                             ep_a = eps)
+    #     acc_rob_input_act_list.append(acc_rob_input_act) 
 
-        acc_rob_param_act, _ = print_accuracy(net, trainloader, testloader, device, test=True, 
-                                                                                ep_i =0, 
-                                                                                ep_w = eps,
-                                                                                ep_b = eps,
-                                                                                ep_a = eps)
-        acc_rob_param_act_list.append(acc_rob_param_act) 
+    #     acc_rob_param_act, _ = print_accuracy(net, trainloader, testloader, device, test=True, 
+    #                                                                             ep_i =0, 
+    #                                                                             ep_w = eps,
+    #                                                                             ep_b = eps,
+    #                                                                             ep_a = eps)
+    #     acc_rob_param_act_list.append(acc_rob_param_act) 
 
-        acc_rob_input_param, _ = print_accuracy(net, trainloader, testloader, device, test=True, 
-                                                                                ep_i =eps, 
-                                                                                ep_w = eps,
-                                                                                ep_b = eps,
-                                                                                ep_a = 0)
-        acc_rob_input_param_list.append(acc_rob_input_param) 
+    #     acc_rob_input_param, _ = print_accuracy(net, trainloader, testloader, device, test=True, 
+    #                                                                             ep_i =eps, 
+    #                                                                             ep_w = eps,
+    #                                                                             ep_b = eps,
+    #                                                                             ep_a = 0)
+    #     acc_rob_input_param_list.append(acc_rob_input_param) 
 
-        acc_rob, _ = print_accuracy(net, trainloader, testloader, device, test=True, 
-                                                                                ep_i = eps, 
-                                                                                ep_w = eps,
-                                                                                ep_b = eps,
-                                                                                ep_a = eps)
-        acc_rob_list.append(acc_rob) 
+    #     acc_rob, _ = print_accuracy(net, trainloader, testloader, device, test=True, 
+    #                                                                             ep_i = eps, 
+    #                                                                             ep_w = eps,
+    #                                                                             ep_b = eps,
+    #                                                                             ep_a = eps)
+    #     acc_rob_list.append(acc_rob) 
 
 
-    result = {'Epsilon': eps_list, 'Guaranteed accuracy with input perturbation': acc_rob_input_list, 
-                                'Guaranteed accuracy with paramater perturbation': acc_rob_param_list,
-                                'Guaranteed accuracy with activation perturbation': acc_rob_act_list, 
-                                'Guaranteed accuracy with input and weight perturbation': acc_rob_input_param_list,
-                                'Guaranteed accuracy with input and activation perturbation': acc_rob_input_act_list,
-                                'Guaranteed accuracy with activation and weight perturbation': acc_rob_param_act_list,
-                                'Guaranteed accuracy with activation, weight and activatsion perturbation': acc_rob_list}
-    path = f'results/MNIST/normal_6_layers_{n_hidden_nodes}_0_03.xlsx'
-    DictExcelSaver.save(result,path)
+    # result = {'Epsilon': eps_list, 'Guaranteed accuracy with input perturbation': acc_rob_input_list, 
+    #                             'Guaranteed accuracy with paramater perturbation': acc_rob_param_list,
+    #                             'Guaranteed accuracy with activation perturbation': acc_rob_act_list, 
+    #                             'Guaranteed accuracy with input and weight perturbation': acc_rob_input_param_list,
+    #                             'Guaranteed accuracy with input and activation perturbation': acc_rob_input_act_list,
+    #                             'Guaranteed accuracy with activation and weight perturbation': acc_rob_param_act_list,
+    #                             'Guaranteed accuracy with activation, weight and activatsion perturbation': acc_rob_list}
+    # path = f'results/MNIST/normal_6_layers_{n_hidden_nodes}_0_03.xlsx'
+    # DictExcelSaver.save(result,path)
 if __name__=="__main__":
     main()

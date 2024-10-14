@@ -6,6 +6,7 @@ interval_bound_propagation/checkpoint/normal/*.pth
 interval_bound_propagation/checkpoint/SVHN/*.pth
 verification/datasets/*
 verification/opt_result/*.xlsx
+verification/opt_result/*.npy
 quantization/datasets/*
 quantization/quantization_results/*
 quantization/extract_params/*

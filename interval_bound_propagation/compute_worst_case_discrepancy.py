@@ -7,6 +7,7 @@ import torchvision.transforms as transforms
 import torch.backends.cudnn as cudnn
 
 from network import *
+import time 
 
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -23,7 +24,7 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=1, sampler=indices,
 
 classes = ('0','1','2','3','4','5','6','7','8','9')
 
-n_hidden_nodes = 64
+n_hidden_nodes = 128
 net =  MNIST_3layers(
     non_negative = [False, False, False], 
     norm = [False, False, False], 
@@ -57,6 +58,7 @@ if __name__ == '__main__':
     worst_case_diff = 0
     with torch.no_grad():
         for batch_idx, (inputs, targets) in enumerate(testloader):
+            start_time = time.time()
             inputs, targets = inputs.to(device), targets.to(device)
             targets = targets.item()
 
@@ -89,6 +91,8 @@ if __name__ == '__main__':
             
 
             diff =  max(best - orig_output, orig_output - worst)
+            end_time = time.time()
+            #print(end_time-start_time)
             #diff =  max(outputs_ub[0,targets] - orig_output, orig_output - outputs_lb[0,targets])
             if diff > worst_case_diff: 
                 worst_case_diff = diff
