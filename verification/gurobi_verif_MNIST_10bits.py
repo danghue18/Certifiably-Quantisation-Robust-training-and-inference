@@ -103,6 +103,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
     time_exceed = 0
     non_robust_count = 0
     total = 0
+    not_successful = 0
     for batch_idx,  (inputs, labels)  in enumerate(testloader, 0):
         start_time = time.time()
         inputs = inputs.view(inputs.size(0), -1)  # Flatten image to a vector
@@ -286,12 +287,13 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
             non_robust_count += 1
             time_exceed += 1
             total += 1
-            print(f'---------------done {total} samples, robust: {robust_count}, non-robust: {non_robust_count} with {time_exceed} time exceeded samples ')
+            print(f'---------------done {total} samples, robust: {robust_count}, non-robust: {non_robust_count} with {time_exceed} time exceeded samples and not successful {not_successful}')
             
             result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 
-                    'Total': total, 'robust': robust_count, 'non-robust': non_robust_count, 'time exceed': time_exceed }
+                    'Total': total, 'robust': robust_count, 'non-robust': non_robust_count, 'time exceed': time_exceed, 'not successful': not_successful}
             path = f'opt_results/exp19_{epsilon_input}_{epsilon_weight}_{epsilon_activation}.xlsx'
             DictExcelSaver.save(result,path)
+
             continue 
 
         # Verify
@@ -306,6 +308,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         else:
             print("--------------Optimization was not successful.")
             non_robust_count += 1
+            not_successful += 1
 
         if model_gurobi.status == GRB.INFEASIBLE:
             print("Model is infeasible. Computing IIS...")
@@ -316,10 +319,10 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         end_time = time.time()
         execution_time = end_time - start_time  
         print(f"Processed sample {batch_idx} in {execution_time:.2f} seconds.")
-        print(f'---------------done {total} samples, robust: {robust_count}, non-robust: {non_robust_count} with {time_exceed} time exceeded samples ')
+        print(f'---------------done {total} samples, robust: {robust_count}, non-robust: {non_robust_count} with {time_exceed} time exceeded samples and not successful {not_successful}')
         
         result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 
-                  'Total': total, 'robust': robust_count, 'non-robust': non_robust_count, 'time exceed': time_exceed }
+                'Total': total, 'robust': robust_count, 'non-robust': non_robust_count, 'time exceed': time_exceed, 'not successful': not_successful}
         path = f'opt_results/exp19_{epsilon_input}_{epsilon_weight}_{epsilon_activation}.xlsx'
         DictExcelSaver.save(result,path)
 
