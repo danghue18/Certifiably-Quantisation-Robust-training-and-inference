@@ -326,4 +326,4 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         DictExcelSaver.save(result,path)
 if __name__ == '__main__':
     test_robustness(model_dictionary,net, testloader, epsilon_input=1/1023, epsilon_weight=1/1023, epsilon_bias=1/1023, epsilon_activation=1/1023)
-# ---------------done 2 samples, worst case discrepancy found is 0.004274725914001465
+# ---------------done 3 samples, worst case discrepancy found is 0.025250792503356934

@@ -30,8 +30,8 @@ def generate_kappa_schedule_MNIST(k=0.5):
 def generate_epsilon_schedule_MNIST(epsilon_train):
     
     epsilon_schedule = 2400*[0]
-    step = epsilon_train/18000
-    for i in range(18000):
+    step = epsilon_train/24000
+    for i in range(24000):
         epsilon_schedule.append(i*step) #warm-up phase
     
     for i in range(45600+60000):

@@ -105,9 +105,9 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False,
 #Model
 print('==> Building model..')
 n_hidden_nodes = 256
-net =  MNIST_6layers(
-    non_negative = [False, False, False,False, False,False], 
-    norm = [False, False, False, False, False,False], 
+net =  MNIST_4layers(
+    non_negative = [False, False, False,False], 
+    norm = [False, False, False, False], 
     n_hidden_nodes=n_hidden_nodes )
     # non_negative = [True, True, True], 
     # norm = [True, True, True])
@@ -138,7 +138,7 @@ if args.resume:
     # Load checkpoint.
     print('==> Resuming from checkpoint..')
     assert os.path.isdir('checkpoint'), 'Error: no checkpoint directory found!'
-    checkpoint = torch.load(f'./checkpoint/MNIST/robust_6_layers_{n_hidden_nodes}_{k}.pth')
+    checkpoint = torch.load(f'./checkpoint/MNIST/robust_4_layers_{n_hidden_nodes}_{k}.pth')
     net.load_state_dict(checkpoint['net'])
     best_acc = checkpoint['acc_rob']
     start_epoch = checkpoint['epoch']
@@ -273,7 +273,7 @@ def train(epoch, batch_counter):
         }
         if not os.path.isdir('checkpoint/MNIST/kchange/'):
             os.mkdir('checkpoint/MNIST/kchange')
-        torch.save(state, f'./checkpoint/MNIST/kchange/robust_6_layers_{n_hidden_nodes}_{k}_{ep_i}.pth')
+        torch.save(state, f'./checkpoint/MNIST/kchange/robust_4_layers_{n_hidden_nodes}_{k}_{ep_i}.pth')
         best_acc = acc_rob
         print("best_acc: ", best_acc)
         nor_acc = acc_nor
@@ -283,7 +283,7 @@ def train(epoch, batch_counter):
         os.mkdir('results/training_phase/MNIST/changek/')
     result={'train fit loss': train_fit_loss_list,'train robust loss': train_robust_loss_list, 'train loss': train_loss_list,
             'val fit loss': val_fit_loss_list, 'val robust loss': val_robust_loss_list, 'val loss': val_loss_list}
-    path = f'results/training_phase/MNIST/changek/robust_6_layers_{n_hidden_nodes}_{k}_{ep_i}.xlsx'
+    path = f'results/training_phase/MNIST/changek/robust_4_layers_{n_hidden_nodes}_{k}_{ep_i}.xlsx'
     DictExcelSaver.save(result,path)
     epoch+= 1
 

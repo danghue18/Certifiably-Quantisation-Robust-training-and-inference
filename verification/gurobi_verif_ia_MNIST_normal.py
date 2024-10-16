@@ -286,6 +286,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
             non_robust_count += 1
             time_exceed += 1
             total += 1
+            
             # print(f"*************Verified robust accuracy with ep_i = {epsilon_input}, ep_w = {epsilon_weight}, ep_b = {epsilon_bias},ep_a = {epsilon_activation}: {robust_count}/{total} ({accuracy:.2f}%)")
             print(f'---------------done {total} samples, robust: {robust_count}, non-robust: {non_robust_count} with {time_exceed} time exceeded samples ')
             
@@ -326,7 +327,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
 
 if __name__ == '__main__':
     #6 bits
-    test_robustness(model_dictionary,net, testloader, epsilon_input=1/64, epsilon_weight=0, epsilon_bias=0, epsilon_activation=0, timeout=1800)
+    test_robustness(model_dictionary,net, testloader, epsilon_input=1/64, epsilon_weight=0, epsilon_bias=0, epsilon_activation=0, timeout=180)
     test_robustness(model_dictionary,net, testloader, epsilon_input=0, epsilon_weight=0, epsilon_bias=0, epsilon_activation=1/32, timeout=1800)
     #8 bits
     test_robustness(model_dictionary,net, testloader, epsilon_input=1/256, epsilon_weight=0, epsilon_bias=0, epsilon_activation=0, timeout=1800)

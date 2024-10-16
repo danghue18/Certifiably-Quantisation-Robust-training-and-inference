@@ -293,4 +293,4 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         
 if __name__ == '__main__':
     test_robustness(model_dictionary,net, testloader, epsilon_input=1/1023, epsilon_weight=1/1023, epsilon_bias=1/1023, epsilon_activation=1/1023)
-   # 2 samples: 0.004107832908630371
+   # 5 samples - worst-case dis: 0.011377096176147461
