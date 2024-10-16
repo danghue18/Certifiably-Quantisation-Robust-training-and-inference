@@ -190,7 +190,7 @@ def train(epoch, batch_counter):
         outputs_nor = net(torch.cat([inputs, inputs], 0))
         outputs_nor  = outputs_nor[:outputs_nor.shape[0]//2]
         loss += kappa_schedule[batch_counter] * criterion(outputs_nor, targets)
-        fit_loss = loss
+        fit_loss = criterion(outputs_nor, targets)
 
         if batch_counter >= 3000: 
             x_ub = inputs + ep_i_schedule[batch_counter]
@@ -206,29 +206,32 @@ def train(epoch, batch_counter):
             outputs = z_lb * lb_mask + z_ub * ub_mask # z_lb is in true label position, z_ub in other positions 
             loss += (1-kappa_schedule[batch_counter]) * criterion(outputs, targets)
             
-            # compute train loss
-            outputs = net.forward(torch.cat([x_ub, x_lb], 0), epsilon_w=ep_w,
-                                                              epsilon_b=ep_b,
-                                                              epsilon_a=ep_a) 
-            z_ub = outputs[:outputs.shape[0]//2]
-            z_lb = outputs[outputs.shape[0]//2:]
-            lb_mask = torch.eye(10).cuda()[targets] # one hot encoding of true label
-            ub_mask = 1 - lb_mask 
-            outputs = z_lb * lb_mask + z_ub * ub_mask # z_lb is in true label position, z_ub in other positions 
-            
-            robust_loss = (1-kappa_schedule[batch_counter]) * criterion(outputs, targets)
-            train_robust_loss +=robust_loss.item()
-        
+        # compute train loss
+        x_ub = inputs + ep_i_schedule[batch_counter]
+        x_lb = inputs - ep_i_schedule[batch_counter]
+        outputs = net.forward(torch.cat([x_ub, x_lb], 0),   epsilon_w=ep_w,
+                                                            epsilon_b=ep_b,
+                                                            epsilon_a=ep_a) 
+        z_ub = outputs[:outputs.shape[0]//2]
+        z_lb = outputs[outputs.shape[0]//2:]
+        lb_mask = torch.eye(10).cuda()[targets] # one hot encoding of true label
+        ub_mask = 1 - lb_mask 
+        outputs = z_lb * lb_mask + z_ub * ub_mask # z_lb is in true label position, z_ub in other positions 
+        robust_loss =  criterion(outputs, targets)
+
+        train_robust_loss +=robust_loss.item()
+        train_fit_loss +=fit_loss.item()
+        train_loss += (kappa_schedule[batch_counter] * fit_loss + (1-kappa_schedule[batch_counter]) * robust_loss).item()
+        #print(kappa_schedule[batch_counter])
         loss.backward()
         optimizer.step()
         batch_counter+=1
 
-        train_fit_loss +=fit_loss.item()
-        train_loss = train_fit_loss + train_robust_loss
+
     
-    # print('1***',train_fit_loss/600)
-    # print('2***',train_robust_loss/600)
-    # print('3***',train_loss/600)
+    print('1***',train_fit_loss/600)
+    print('2***',train_robust_loss/600)
+    print('3***',train_loss/600)
 
     train_fit_loss_list.append(train_fit_loss/600)
     train_robust_loss_list.append(train_robust_loss/600)
