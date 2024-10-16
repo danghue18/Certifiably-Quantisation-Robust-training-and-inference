@@ -26,10 +26,10 @@ from multiprocessing import freeze_support
 parser = argparse.ArgumentParser(description='PyTorch MNIST Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument('--k', default=0.5, type=float, help='kappa')
-parser.add_argument('--ep_i', default=1/255, type=float, help='epsilon_input')
-parser.add_argument('--ep_w', default=2/255, type=float, help='epsilon_weight')
-parser.add_argument('--ep_b', default=2/255, type=float, help='epsilon_bias')
-parser.add_argument('--ep_a', default=2/255, type=float, help='epsilon_activation')
+parser.add_argument('--ep_i', default=1/256, type=float, help='epsilon_input')
+parser.add_argument('--ep_w', default=1/128, type=float, help='epsilon_weight')
+parser.add_argument('--ep_b', default=1/128, type=float, help='epsilon_bias')
+parser.add_argument('--ep_a', default=1/128, type=float, help='epsilon_activation')
 parser.add_argument('--resume', '-r', action='store_true', help='resume from checkpoint')
 args = parser.parse_args()
 
@@ -121,16 +121,7 @@ if device == 'cuda':
     net = torch.nn.DataParallel(net)
     cudnn.benchmark = True
 
-if args.resume:
-    # Load checkpoint.
-    print('==> Resuming from checkpoint..')
-    assert os.path.isdir('checkpoint'), 'Error: no checkpoint directory found!'
-    checkpoint = torch.load(f'./checkpoint/MNIST/robust_6_layers_{n_hidden_nodes}_0_06.pth')
-    net.load_state_dict(checkpoint['net'])
-    best_acc = checkpoint['acc_rob']
-    start_epoch = checkpoint['epoch']
 
-criterion = nn.CrossEntropyLoss()
 
 ep_i = args.ep_i
 ep_w = args.ep_w
@@ -143,6 +134,16 @@ ep_w_schedule = generate_epsilon_schedule_MNIST(ep_w)
 ep_b_schedule = generate_epsilon_schedule_MNIST(ep_b)
 ep_a_schedule = generate_epsilon_schedule_MNIST(ep_a)
 
+if args.resume:
+    # Load checkpoint.
+    print('==> Resuming from checkpoint..')
+    assert os.path.isdir('checkpoint'), 'Error: no checkpoint directory found!'
+    checkpoint = torch.load(f'./checkpoint/MNIST/robust_6_layers_{n_hidden_nodes}_{k}.pth')
+    net.load_state_dict(checkpoint['net'])
+    best_acc = checkpoint['acc_rob']
+    start_epoch = checkpoint['epoch']
+
+criterion = nn.CrossEntropyLoss()
 
 
 
@@ -229,9 +230,9 @@ def train(epoch, batch_counter):
 
 
     
-    print('1***',train_fit_loss/600)
-    print('2***',train_robust_loss/600)
-    print('3***',train_loss/600)
+    # print('1***',train_fit_loss/600)
+    # print('2***',train_robust_loss/600)
+    # print('3***',train_loss/600)
 
     train_fit_loss_list.append(train_fit_loss/600)
     train_robust_loss_list.append(train_robust_loss/600)
@@ -273,12 +274,16 @@ def train(epoch, batch_counter):
         }
         if not os.path.isdir('checkpoint/MNIST/kchange/'):
             os.mkdir('checkpoint/MNIST/kchange')
-        torch.save(state, f'./checkpoint/MNIST/robust_6_layers_{n_hidden_nodes}_0.5.pth')
+        torch.save(state, f'./checkpoint/MNIST/kchange/robust_6_layers_{n_hidden_nodes}_{k}_{ep_i}.pth')
         best_acc = acc_rob
         print("best_acc: ", best_acc)
         nor_acc = acc_nor
         print("nor_acc: ", nor_acc)
 
+    result={'train fit loss': train_fit_loss_list,'train robust loss': train_robust_loss_list, 'train loss': train_loss_list,
+            'val fit loss': val_fit_loss_list, 'val robust loss': val_robust_loss_list, 'val loss': val_loss_list}
+    path = f'results/training_phase/MNIST/changek/robust_6_layers_{n_hidden_nodes}_{k}_{ep_i}.xlsx'
+    DictExcelSaver.save(result,path)
     epoch+= 1
 
 
@@ -293,10 +298,10 @@ if __name__=="__main__":
     print("nor_acc: ", nor_acc)
     
 
-    result={'train fit loss': train_fit_loss_list,'train robust loss': train_robust_loss_list, 'train loss': train_loss_list,
-            'val fit loss': val_fit_loss_list, 'val robust loss': val_robust_loss_list, 'val loss': val_loss_list}
-    path = f'results/training_phase/MNIST/changek/robust_6_layers_{n_hidden_nodes}_0_5.xlsx'
-    DictExcelSaver.save(result,path)
+    # result={'train fit loss': train_fit_loss_list,'train robust loss': train_robust_loss_list, 'train loss': train_loss_list,
+    #         'val fit loss': val_fit_loss_list, 'val robust loss': val_robust_loss_list, 'val loss': val_loss_list}
+    # path = f'results/training_phase/MNIST/changek/robust_6_layers_{n_hidden_nodes}_{k}_{ep_i}.xlsx'
+    # DictExcelSaver.save(result,path)
 
 
 
