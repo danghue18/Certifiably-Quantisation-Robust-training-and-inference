@@ -65,7 +65,7 @@ net = net.to(device)
 # Load checkpoint.
 # print('==> Resuming from checkpoint..')
 # assert os.path.isdir('checkpoint'), 'Error: no checkpoint directory found!'
-checkpoint = torch.load(r'C:\Users\hueda\Documents\Model_robust_weight_perturbation\interval_bound_propagation\checkpoint\MNIST\running_eps_1_255.pth')
+checkpoint = torch.load(r'C:\Users\hueda\Documents\Model_robust_weight_perturbation\interval_bound_propagation\checkpoint\MNIST\normal_6_layers.pth')
 net.load_state_dict(checkpoint['net'])
 best_acc = checkpoint['acc_rob']
 start_epoch = checkpoint['epoch']

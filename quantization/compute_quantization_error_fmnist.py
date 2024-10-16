@@ -203,7 +203,7 @@ if __name__ == '__main__':
         #l_inf_list.append(float(l_inf))
 
     
-
+ 
     result = {'Bx ': Bx_list, 'Bx ': Bx_list, 'Bb ': Bb_list, 'Ba ': Ba_list, 'Quantize_accuracy': acc_fx_list, 'Quantization_error':l_inf_list }
     path = f'quantization_results/FMNIST/v2_bound_quantization_error_norm_inf_4_in_4_act_new_normal.xlsx'
     DictExcelSaver.save(result,path)

@@ -26,10 +26,10 @@ from multiprocessing import freeze_support
 parser = argparse.ArgumentParser(description='PyTorch MNIST Training')
 parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
 parser.add_argument('--k', default=0.5, type=float, help='kappa')
-parser.add_argument('--ep_i', default=1/1024, type=float, help='epsilon_input')
-parser.add_argument('--ep_w', default=1/512, type=float, help='epsilon_weight')
-parser.add_argument('--ep_b', default=1/512, type=float, help='epsilon_bias')
-parser.add_argument('--ep_a', default=1/512, type=float, help='epsilon_activation')
+parser.add_argument('--ep_i', default=1/255, type=float, help='epsilon_input')
+parser.add_argument('--ep_w', default=2/255, type=float, help='epsilon_weight')
+parser.add_argument('--ep_b', default=2/255, type=float, help='epsilon_bias')
+parser.add_argument('--ep_a', default=2/255, type=float, help='epsilon_activation')
 parser.add_argument('--resume', '-r', action='store_true', help='resume from checkpoint')
 args = parser.parse_args()
 
@@ -104,9 +104,9 @@ testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False,
 #Model
 print('==> Building model..')
 n_hidden_nodes = 256
-net =  MNIST_4layers(
-    non_negative = [False, False, False,False], 
-    norm = [False, False, False, False], 
+net =  MNIST_6layers(
+    non_negative = [False, False, False,False, False,False], 
+    norm = [False, False, False, False, False,False], 
     n_hidden_nodes=n_hidden_nodes )
     # non_negative = [True, True, True], 
     # norm = [True, True, True])
@@ -190,7 +190,10 @@ def train(epoch, batch_counter):
             x_lb = inputs - ep_i_schedule[batch_counter]
             outputs = net.forward(torch.cat([x_ub, x_lb], 0), epsilon_w=ep_w_schedule[batch_counter],
                                                               epsilon_b=ep_b_schedule[batch_counter],
-                                                              epsilon_a=ep_a_schedule[batch_counter])                     
+                                                              epsilon_a=ep_a_schedule[batch_counter])          
+            # outputs = net.forward(torch.cat([x_ub, x_lb], 0), epsilon_w=ep_w,
+            #                                                   epsilon_b=ep_b,
+            #                                                   epsilon_a=ep_a)                        
 
             z_ub = outputs[:outputs.shape[0]//2]
             z_lb = outputs[outputs.shape[0]//2:]
@@ -198,13 +201,14 @@ def train(epoch, batch_counter):
             ub_mask = 1 - lb_mask 
             outputs = z_lb * lb_mask + z_ub * ub_mask # z_lb is in true label position, z_ub in other positions 
             loss += (1-kappa_schedule[batch_counter]) * criterion(outputs, targets)
+
         loss.backward()
         optimizer.step()
         batch_counter+=1
 
         train_loss += loss.item()
 
-    #print('Loss in training: %.3f' % (train_loss / 600))
+    #print('Total loss in training: %.3f' % (train_loss / 600))
     net.eval()
     #     print_accuracy(net, trainloader, testloader, device, test=True, eps = 2/255)
     _, l = print_accuracy(net, trainloader, testloader, device, test=False, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
@@ -215,7 +219,7 @@ def train(epoch, batch_counter):
                                                                 ep_a=args.ep_a)
     
     loss_train_list.append(loss_train)
-
+    #print('Loss computed print_acc function:',l+loss_train)
     acc_nor,l = print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep_w = 0, ep_b = 0, ep_a = 0)
     acc_nor_list.append(acc_nor)
     loss_val_non_robust.append(l)
@@ -235,7 +239,7 @@ def train(epoch, batch_counter):
         }
         if not os.path.isdir('checkpoint/MNIST'):
             os.mkdir('checkpoint/MNIST')
-        torch.save(state, f'./checkpoint/MNIST/robust_4_layers_{n_hidden_nodes}_10bits.pth')
+        torch.save(state, f'./checkpoint/MNIST/robust_6_layers_{n_hidden_nodes}_0.5.pth')
         best_acc = acc_rob
         print("best_acc: ", best_acc)
         nor_acc = acc_nor

@@ -286,9 +286,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
         if not optimization_status:  
             non_robust_count += 1
             time_exceed += 1
-            total += 1
-            print(f'---------------done {total} samples, robust: {robust_count}, non-robust: {non_robust_count} with {time_exceed} time exceeded samples ')
-            
+            total += 1            
             print(f'---------------done {total} samples, robust: {robust_count}, non-robust: {non_robust_count} with {time_exceed} time exceeded samples and not successful {not_successful}')
             
             result = {'ep_i':epsilon_input, 'ep_w': epsilon_weight, 'ep_b': epsilon_bias, 'ep_a':epsilon_activation, 

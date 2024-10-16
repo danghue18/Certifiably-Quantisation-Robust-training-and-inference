@@ -7,7 +7,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 import torch.nn as nn
 from torch.nn.parameter import Parameter
-from .module import *
+from module import *
 import torch.nn.utils.spectral_norm as SpectralNorm
 
 

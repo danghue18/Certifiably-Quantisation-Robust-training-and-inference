@@ -20,7 +20,7 @@ checkpoint_path = os.path.join(root, os.getenv("CHECKPOINT_PATH21"))
 weight_folder = os.path.join(root,os.getenv('WEIGHT_FOLDER21'))
 
 sys.path.append(root)
-from interval_bound_propagation.network import *
+from interval_bound_propagation.network_v import *
 from interval_bound_propagation.utils import DictExcelSaver
 
 
@@ -293,6 +293,7 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
                     'Total': total, 'robust': robust_count, 'non-robust': non_robust_count, 'time exceed': time_exceed }
             path = f'opt_results/exp21_normal_{epsilon_input}_{epsilon_weight}_{epsilon_activation}.xlsx'
             DictExcelSaver.save(result,path)
+            continue
 
         # Verify
         if model_gurobi.status == GRB.OPTIMAL:  
