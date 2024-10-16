@@ -280,6 +280,8 @@ def train(epoch, batch_counter):
         nor_acc = acc_nor
         print("nor_acc: ", nor_acc)
 
+    if not os.path.isdir('results/training_phase/MNIST/changek/'):
+        os.mkdir('results/training_phase/MNIST/changek/')
     result={'train fit loss': train_fit_loss_list,'train robust loss': train_robust_loss_list, 'train loss': train_loss_list,
             'val fit loss': val_fit_loss_list, 'val robust loss': val_robust_loss_list, 'val loss': val_loss_list}
     path = f'results/training_phase/MNIST/changek/robust_6_layers_{n_hidden_nodes}_{k}_{ep_i}.xlsx'
