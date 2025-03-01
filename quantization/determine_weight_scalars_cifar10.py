@@ -1,9 +1,9 @@
 import numpy as np
 import os
 
-read_folder_name = 'extracted_params/CIFAR10/old_1_511/'
+read_folder_name = 'extracted_params/CIFAR10/robust_1_1023/'
 
-write_folder_name = 'scalars/CIFAR10/old_1_511/'
+write_folder_name = 'scalars/CIFAR10/robust_1_1023/'
 if not os.path.isdir(write_folder_name):
     os.mkdir(write_folder_name)
 

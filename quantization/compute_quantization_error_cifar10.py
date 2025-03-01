@@ -13,8 +13,9 @@ import torchvision.transforms as transforms
 import os
 import argparse
 
-new_path = "C:/Users/hueda/Documents/Model_robust_weight_perturbation"
-sys.path.append(new_path) 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
 
 
 from interval_bound_propagation.utils import progress_bar
@@ -36,8 +37,8 @@ start_epoch = 0  # start from epoch 0 or last checkpoint epoch
 # Data
 print('==> Preparing data..')
 transform_train = transforms.Compose([
-    transforms.RandomCrop(32, padding=4),
-    transforms.RandomHorizontalFlip(),
+    # transforms.RandomCrop(32, padding=4),
+    # transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
 ])
@@ -48,7 +49,7 @@ transform_test = transforms.Compose([
 ])
 
 trainset = torchvision.datasets.CIFAR10(root='datasets', train=True, download=True, transform=transform_train)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=128, shuffle=True, num_workers=2)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=200, shuffle=True, num_workers=2)
 
 testset = torchvision.datasets.CIFAR10(root='datasets', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=2)
@@ -61,10 +62,6 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship'
 net =  CIFAR10_MLP(
     non_negative = [False, False, False,False, False, False], 
     norm = [False, False, False, False, False, False])
-    # non_negative = [True, True, True], 
-    # norm = [True, True, True])
-    # non_negative = [True, True, True], 
-    # norm = [False, False, False])
 net = net.to(device)
 if device == 'cuda':
     net = torch.nn.DataParallel(net)
@@ -72,14 +69,14 @@ if device == 'cuda':
 
 
 print('==> load full precision model.')
-checkpoint = torch.load(r'C:\Users\hueda\Documents\Model_robust_weight_perturbation\interval_bound_propagation\checkpoint\CIFAR10\new_lost_running_eps_0.00392156862745098.pth')
+checkpoint = torch.load(r'C:\Users\hueda\Documents\Model_robust_weight_perturbation\interval_bound_propagation\checkpoint\CIFAR10\test_robust_0.0004943153732081067_0.0009775171065493646_0.0019569471624266144.pth')
 net.load_state_dict(checkpoint['net'])
 
 
 
 #load numpy files
 model_dictionary = {}
-model_name = 'CIFAR10/new_1_255/'
+model_name = 'CIFAR10/robust_1_1023/'
 folder_name = 'extracted_params/'+model_name
 
 name = 'linear_layers'
@@ -147,11 +144,13 @@ if __name__ == '__main__':
     freeze_support()
     fl_model_outputs = []
     ground_truth = []
+    all_labels = []
     fx_model_outputs_list = []
     
     with torch.no_grad():
         for batch_idx, (inputs, targets) in enumerate(testloader):
             ground_truth += targets.tolist()
+            all_labels.append(targets)
             inputs, targets = inputs.to(device), targets.to(device)
 
             # value_fl_batch = feedforward(inputs,model_dictionary,32,32,32,32)
@@ -161,20 +160,20 @@ if __name__ == '__main__':
             value_fl_batch = F.softmax(value_fl_batch, dim=1)
             #print(value_fl_batch)
             fl_model_outputs.append(value_fl_batch) # shape: batch x 10
-        
+    all_labels = torch.cat(all_labels)
+    all_labels = all_labels.numpy()
+    print(all_labels)
     fl_model_outputs = torch.cat(fl_model_outputs).cpu()
     print((np.array(fl_model_outputs)).shape)
 
     #acc = test(model_dictionary,testloader,32,32,32,32)
     acc,_ = print_accuracy(net, trainloader, testloader, device, test=True)
     print("accuracy fl: ",acc)
-    acc = test(model_dictionary,testloader,32,32,32,32)
-    print("acc fl 32 bit: ", acc)
 
     acc_fx_list = []
-    for bw in range(2,17):
-        bi = 4
-        ba = 4
+    for bw in range(8,9):
+        bi = 32
+        ba = 8
         print("Ba: ", ba, "Bw: ", bw)
         fx_model_outputs = []
         #fx_model_predicts = []
@@ -202,19 +201,18 @@ if __name__ == '__main__':
 
 
     for fx_model_outputs in fx_model_outputs_list:
-        # print(fx_model_outputs.shape)
-        # print(fl_model_outputs.shape)
-        print((fx_model_outputs - fl_model_outputs).shape) # 10k x 10
-        print(torch.norm(fx_model_outputs - fl_model_outputs, p=float('inf'), dim=1).shape) # 10k x 1
-        l_inf = torch.max(torch.norm(fx_model_outputs - fl_model_outputs, p=float('inf'), dim=1))
-        #l_inf = torch.max(torch.norm(fx_model_outputs - fl_model_outputs, p=1, dim=1))
-        l_inf_list.append(float(l_inf))
+
+        #print((fx_model_outputs - fl_model_outputs).shape) # 10k x 10
+        diff = abs(fx_model_outputs - fl_model_outputs) #10k x 10
+        worst_case_dis = (diff[np.arange(diff.shape[0]), all_labels]).mean()
+        l_inf_list.append(worst_case_dis)
+
 
     
 
-    result = {'Bx ': Bx_list, 'Bx ': Bx_list, 'Bb ': Bb_list, 'Ba ': Ba_list, 'Quantize_accuracy': acc_fx_list, 'Quantization_error':l_inf_list }
-    path = f'quantization_results/CIFAR10/bound_quantization_error_norm_inf_4_in_4_act_new_1_255.xlsx'
-    DictExcelSaver.save(result,path)
+    # result = {'Bx ': Bx_list, 'Bx ': Bx_list, 'Bb ': Bb_list, 'Ba ': Ba_list, 'Quantize_accuracy': acc_fx_list, 'Quantization_error':l_inf_list }
+    # path = f'quantization_results/CIFAR10/bound_quantization_error_mean_4_in_4_act_robust_1_1023.xlsx'
+    # DictExcelSaver.save(result,path)
 
  
 

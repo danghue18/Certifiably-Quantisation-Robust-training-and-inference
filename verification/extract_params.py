@@ -8,12 +8,12 @@ import torchvision.transforms as transforms
 
 import sys
 
-new_path = "C:/Users/hueda/Documents/Model_robust_weight_perturbation"
-sys.path.append(new_path) 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
 
 from interval_bound_propagation.network import *
 from interval_bound_propagation.compute_acc import *
-
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 n_hidden_nodes = 256

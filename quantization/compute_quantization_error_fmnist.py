@@ -13,8 +13,9 @@ import torchvision.transforms as transforms
 import os
 import argparse
 
-new_path = "C:/Users/hueda/Documents/Model_robust_weight_perturbation"
-sys.path.append(new_path) 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
 
 
 from interval_bound_propagation.utils import progress_bar
@@ -191,16 +192,12 @@ if __name__ == '__main__':
 
 
     for fx_model_outputs in fx_model_outputs_list:
-        # print(fx_model_outputs.shape)
-        # print(fl_model_outputs.shape)
-        print((fx_model_outputs - fl_model_outputs).shape) # 10k x 10
+
+        #print((fx_model_outputs - fl_model_outputs).shape) # 10k x 10
         diff = abs(fx_model_outputs - fl_model_outputs) #10k x 10
         worst_case_dis = max(diff[np.arange(diff.shape[0]), all_labels])
         l_inf_list.append(worst_case_dis)
-        # print(torch.norm(fx_model_outputs - fl_model_outputs, p=float('inf'), dim=1).shape) # 10k x 1
-        # l_inf = torch.max(torch.norm(fx_model_outputs - fl_model_outputs, p=float('inf'), dim=1))
-        #l_inf = torch.max(torch.norm(fx_model_outputs - fl_model_outputs, p=1, dim=1))
-        #l_inf_list.append(float(l_inf))
+
 
     
  

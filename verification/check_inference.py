@@ -8,9 +8,11 @@ import torchvision.transforms as transforms
 from multiprocessing import freeze_support
 
 import sys
+import os
 
-new_path = "C:/Users/hueda/Documents/Model_robust_weight_perturbation"
-sys.path.append(new_path) 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
 
 from interval_bound_propagation.network import *
 from interval_bound_propagation.compute_acc import *

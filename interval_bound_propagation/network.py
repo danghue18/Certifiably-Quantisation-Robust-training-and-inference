@@ -625,3 +625,107 @@ class SVHN_MLP(nn.Module):
         x_lb = x[x.shape[0]//2:]
         bounds.append((x_ub, x_lb))
         return bounds
+
+
+class Small_ConvNet(nn.Module):
+    def __init__(self,
+                 non_negative = [True, True, True, True], 
+                 norm = [False, False, False, False]):
+        
+        super(Small_ConvNet, self).__init__()
+        self.conv1 = RobustConv2d(1,16,4,2, padding = 1, non_negative =non_negative[0])
+        if norm[0]:
+            self.conv1 = SpectralNorm(self.conv1)
+        self.conv2 = RobustConv2d(16,32,4,1, padding= 1, non_negative =non_negative[1])
+        if norm[1]:
+            self.conv2 = SpectralNorm(self.conv2)
+        self.fc1 = RobustLinear(13*13*32, 100, non_negative =non_negative[2])
+        if norm[2]:
+            self.fc1 = SpectralNorm(self.fc1)
+        self.fc2 = RobustLinear(100,10, non_negative =non_negative[3])
+        if norm[3]:
+            self.fc2 = SpectralNorm(self.fc2)
+        
+        self.activation = RobustReLu()
+        
+    def forward(self,x, epsilon_w=0, epsilon_b=0, epsilon_a=0):
+        x = self.conv1(x, epsilon_w, epsilon_b)
+        x = self.activation(x, epsilon_a)
+        x = self.conv2(x, epsilon_w, epsilon_b)
+        x = self.activation(x, epsilon_a)
+        x = self.fc1(x.view(x.shape[0], -1), epsilon_w, epsilon_b)
+        x = self.activation(x, epsilon_a)
+        x = self.fc2(x, epsilon_w, epsilon_b)
+        return x
+
+class Cifar_Small_ConvNet(nn.Module):
+    def __init__(self,
+                 non_negative = [True, True, True, True], 
+                 norm = [False, False, False, False]):
+        
+        super(Cifar_Small_ConvNet, self).__init__()
+        self.conv1 = RobustConv2d(3,16,4, stride = 2, padding = 0, non_negative = non_negative[0])
+        if norm[0]:
+            self.conv1 = SpectralNorm(self.conv1)
+        self.conv2 = RobustConv2d(16,32,4, stride = 1, padding= 0, non_negative = non_negative[1])
+        if norm[1]:
+            self.conv2 = SpectralNorm(self.conv2)
+        self.fc1 = RobustLinear(12*12*32, 100, non_negative = non_negative[2])
+        if norm[2]:
+            self.fc1 = SpectralNorm(self.fc1)
+        self.fc2 = RobustLinear(100,10, non_negative = non_negative[3])
+        if norm[3]:
+            self.fc2 = SpectralNorm(self.fc2)
+            
+        # self.deconv1 = nn.ConvTranspose2d(32,16,4, padding = 0, stride = 1)
+        # self.deconv2 = nn.ConvTranspose2d(16,3,4, padding = 0, stride = 2)
+        
+        self.activation = RobustReLu()
+        #self.score_function = self.fc2
+        
+        #self.image_norm = ImageNorm([0.4914, 0.4822, 0.4465],[0.2023, 0.1994, 0.2010])
+    
+    def forward_conv(self,x,epsilon_w=0, epsilon_b=0, epsilon_a=0):
+        #x = self.image_norm(x)
+        x = self.conv1(x,epsilon_w, epsilon_b)
+        x = self.activation(x, epsilon_a)
+        x = self.conv2(x,epsilon_w, epsilon_b)
+        x = self.activation(x, epsilon_a)
+        return x
+
+    def forward_g(self, x, epsilon_w=0, epsilon_b=0, epsilon_a=0):
+        x = self.forward_conv(x,epsilon_w, epsilon_b, epsilon_a) 
+        x = self.fc1(x.view(x.shape[0], -1))
+        x = self.activation(x, epsilon_a)
+        return x
+        
+    def forward(self, x, epsilon_w=0, epsilon_b=0, epsilon_a=0):
+        x = self.fc2(self.forward_g(x, epsilon_w, epsilon_b, epsilon_a))
+        return x  
+    
+
+class CIFAR10_MLP_s(nn.Module):
+    def __init__(self):
+        super(CIFAR10_MLP_s, self).__init__()
+        self.fc1 = nn.Linear(32 * 32 * 3, 256)
+        self.fc2 = nn.Linear(256, 128)
+        self.fc3 = nn.Linear(128, 64)
+        self.fc4 = nn.Linear(64, 32)
+        self.fc5 = nn.Linear(32, 16)
+        self.fc6 = nn.Linear(16, 10)
+        self.activation = nn.ReLU()  
+    
+    def forward(self, x):
+        x = x.view(x.shape[0], -1)
+        x = self.activation(self.fc1(x))
+        x = self.activation(self.fc2(x))
+        x = self.activation(self.fc3(x))
+        x = self.activation(self.fc4(x))
+        x = self.activation(self.fc5(x))
+        x = self.fc6(x)
+        return x
+
+def MLP_cifar10(): 
+    model = CIFAR10_MLP_s()
+    return model 
+

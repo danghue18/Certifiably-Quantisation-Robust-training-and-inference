@@ -29,31 +29,18 @@ class RobustLinear(nn.Module):
             self.bias = Parameter(torch.zeros(out_features))
         else:
             self.bias = None
-
-        # if epsilon_w: 
-        #     self.epsilon_w = Parameter(torch.full(out_features, in_features), epsilon_w)
-        # else: 
-        #     self.epsilon_w = Parameter(torch.zeros(out_features, in_features))
-        
-        # if epsilon_b: 
-        #     self.epsilon_b = Parameter(torch.full(out_features), epsilon_b)
-        # else: 
-        #     self.epsilon_b = Parameter(torch.zeros(out_features))
         
         self.non_negative = non_negative
 
 
     def forward(self, input, epsilon_w=0, epsilon_b=0):
-        # input chứa cả lower bound và upper bound (input_L, input_U) được gộp lại.
         input_u = input[:input.shape[0]//2]
         input_l = input[input.shape[0]//2:]
-        # if self.non_negative:
-        #     out_l = F.linear(input_l, F.relu(self.weight), self.bias) + F.linear(input_l, self.epsilon_w, self.epsilon_b)
-        #     out_u = F.linear(input_u, F.relu(self.weight), self.bias) - F.linear(input_l, self.epsilon_w, self.epsilon_b)
-        #     return torch.cat([out_l, out_u], 0)
-        
+
         u = (input_u + input_l)/2
         r = (input_u - input_l)/2
+        # print(u.shape, self.weight.shape)
+        # print((torch.norm(u, p=1, dim=1, keepdim=True)).shape)
         out_u = F.linear(u, self.weight, self.bias) + epsilon_w * torch.norm(u, p=1, dim=1, keepdim=True)
         out_r = F.linear(r, torch.abs(self.weight), None) + epsilon_w * torch.norm(r, p=1, dim=1, keepdim=True) + epsilon_b
         return torch.cat([out_u + out_r, out_u - out_r], 0)
@@ -90,10 +77,12 @@ class RobustConv2d(nn.Module):
             
         u = (input_u + input_l)/2
         r = (input_u - input_l)/2 
+        # print(u.shape, self.weight.shape)
+        # print((torch.norm(u, p=1, dim=1, keepdim=True)).shape)
         out_u = F.conv2d(u, self.weight,self.bias, self.stride,
-                        self.padding, self.dilation, self.groups) + epsilon_w * torch.norm(u, p=1, dim=1, keepdim=True)
+                        self.padding, self.dilation, self.groups) + epsilon_w * torch.norm(u, p=1, dim=(1,2,3), keepdim=True)
         out_r = F.conv2d(r, torch.abs(self.weight), None, self.stride,
-                        self.padding, self.dilation, self.groups) + epsilon_w * torch.norm(r, p=1, dim=1, keepdim=True) + epsilon_b
+                        self.padding, self.dilation, self.groups) + epsilon_w * torch.norm(r, p=1, dim=(1,2,3), keepdim=True) + epsilon_b
         return torch.cat([out_u + out_r, out_u - out_r], 0)
 
 

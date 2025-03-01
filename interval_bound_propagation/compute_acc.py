@@ -28,7 +28,7 @@ def print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep
             z_lb = outputs[outputs.shape[0]//2:]
             #print(z_lb==z_ub)
             #loss_nor = criterion(z_ub, labels)
-            lb_mask = torch.eye(10).cuda()[labels]
+            lb_mask = torch.eye(10).to(device)[labels]
             ub_mask = 1 - lb_mask
             outputs = z_lb * lb_mask + z_ub * ub_mask
             loss = criterion(outputs, labels)
@@ -37,7 +37,7 @@ def print_accuracy(net, trainloader, testloader, device, test=True, ep_i = 0, ep
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
-            progress_bar(batch_idx, len(loader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+    progress_bar(batch_idx, len(loader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
             % (check_loss/(batch_idx+1), 100.*correct/total, correct, total))
 
     correct = correct / total

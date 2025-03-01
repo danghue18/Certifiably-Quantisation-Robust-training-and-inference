@@ -27,6 +27,7 @@ def generate_kappa_schedule_MNIST(k=0.5):
         kappa_schedule.append(k)
     return kappa_schedule
 
+
 def generate_epsilon_schedule_MNIST(epsilon_train):
     
     epsilon_schedule = 2400*[0]
@@ -40,10 +41,16 @@ def generate_epsilon_schedule_MNIST(epsilon_train):
     #     epsilon_schedule.append(epsilon_train)
     return epsilon_schedule
 
+def generate_epsilon_fixed_MNIST(epsilon_train):
+    
+    epsilon_schedule = 2400*[0]
+    for i in range(57600+60000):
+        epsilon_schedule.append(epsilon_train)
+    return epsilon_schedule
 
 def generate_kappa_schedule_CIFAR10(k=0.5):
 
-    kappa_schedule = 12000*[1] # warm-up phase
+    kappa_schedule = 10000*[1] # warm-up phase
     kappa_value = 1.0
     #step = k/12000
     
@@ -60,9 +67,9 @@ def generate_kappa_schedule_CIFAR10(k=0.5):
 
 def generate_epsilon_schedule_CIFAR10(epsilon_train):
     
-    epsilon_schedule = 12000*[0]
-    step = epsilon_train/12000
-    for i in range(12000):
+    epsilon_schedule = 10000*[0]
+    step = epsilon_train/20000
+    for i in range(20000):
         epsilon_schedule.append(i*step) #warm-up phase
     
     for i in range(45600+60000):
@@ -100,10 +107,6 @@ def generate_epsilon_schedule_SVHN(epsilon_train):
     # for i in range(57600+60000):
     #     epsilon_schedule.append(epsilon_train)
     return epsilon_schedule
-
-
-
-
 
 
 def get_terminal_size():

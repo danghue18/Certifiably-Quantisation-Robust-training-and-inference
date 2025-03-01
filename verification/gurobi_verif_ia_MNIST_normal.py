@@ -33,7 +33,8 @@ transform_test = transforms.Compose([
 
 testset = torchvision.datasets.MNIST(root='\datasets', train=False, download=True, transform=transform_test)
 
-indices = list(range(0, 100))
+indices = list(range(100, 200))
+#25: all robust
 testloader = torch.utils.data.DataLoader(testset, batch_size=1, sampler=indices, num_workers=2)
 # testloader = torch.utils.data.DataLoader(testset, batch_size=1, shuffle=False, num_workers=2)
 
@@ -327,8 +328,8 @@ def test_robustness(model_dictionary, net, testloader, epsilon_input=1/255, epsi
 
 if __name__ == '__main__':
     #6 bits
-    test_robustness(model_dictionary,net, testloader, epsilon_input=1/64, epsilon_weight=0, epsilon_bias=0, epsilon_activation=0, timeout=180)
-    test_robustness(model_dictionary,net, testloader, epsilon_input=0, epsilon_weight=0, epsilon_bias=0, epsilon_activation=1/32, timeout=1800)
+    # test_robustness(model_dictionary,net, testloader, epsilon_input=1/64, epsilon_weight=0, epsilon_bias=0, epsilon_activation=0, timeout=180)
+    # test_robustness(model_dictionary,net, testloader, epsilon_input=0, epsilon_weight=0, epsilon_bias=0, epsilon_activation=1/32, timeout=1800)
     #8 bits
     test_robustness(model_dictionary,net, testloader, epsilon_input=1/256, epsilon_weight=0, epsilon_bias=0, epsilon_activation=0, timeout=1800)
     test_robustness(model_dictionary,net, testloader, epsilon_input=0, epsilon_weight=0, epsilon_bias=0, epsilon_activation=1/128, timeout=1800)
