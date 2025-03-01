@@ -1,0 +1,1207 @@
+{
+    "validation": [
+        {
+            "batch": 1,
+            "val_loss": 2.314682722091675,
+            "val_acc1": 11.0,
+            "val_acc5": 49.0
+        },
+        {
+            "batch": 2,
+            "val_loss": 2.304063320159912,
+            "val_acc1": 10.0,
+            "val_acc5": 56.0
+        },
+        {
+            "batch": 3,
+            "val_loss": 2.296337842941284,
+            "val_acc1": 14.0,
+            "val_acc5": 53.0
+        },
+        {
+            "batch": 4,
+            "val_loss": 2.319030523300171,
+            "val_acc1": 10.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 5,
+            "val_loss": 2.30329966545105,
+            "val_acc1": 11.0,
+            "val_acc5": 52.0
+        },
+        {
+            "batch": 6,
+            "val_loss": 2.330772876739502,
+            "val_acc1": 15.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 7,
+            "val_loss": 2.3197877407073975,
+            "val_acc1": 12.0,
+            "val_acc5": 46.0
+        },
+        {
+            "batch": 8,
+            "val_loss": 2.3050217628479004,
+            "val_acc1": 9.0,
+            "val_acc5": 53.0
+        },
+        {
+            "batch": 9,
+            "val_loss": 2.299654245376587,
+            "val_acc1": 5.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 10,
+            "val_loss": 2.300182819366455,
+            "val_acc1": 12.0,
+            "val_acc5": 52.0
+        },
+        {
+            "batch": 11,
+            "val_loss": 2.3406903743743896,
+            "val_acc1": 6.0,
+            "val_acc5": 44.0
+        },
+        {
+            "batch": 12,
+            "val_loss": 2.304450273513794,
+            "val_acc1": 9.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 13,
+            "val_loss": 2.291748285293579,
+            "val_acc1": 12.0,
+            "val_acc5": 55.0
+        },
+        {
+            "batch": 14,
+            "val_loss": 2.319882392883301,
+            "val_acc1": 11.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 15,
+            "val_loss": 2.304657220840454,
+            "val_acc1": 10.0,
+            "val_acc5": 47.0
+        },
+        {
+            "batch": 16,
+            "val_loss": 2.340069055557251,
+            "val_acc1": 2.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 17,
+            "val_loss": 2.306338310241699,
+            "val_acc1": 14.0,
+            "val_acc5": 52.0
+        },
+        {
+            "batch": 18,
+            "val_loss": 2.317195177078247,
+            "val_acc1": 6.0,
+            "val_acc5": 52.0
+        },
+        {
+            "batch": 19,
+            "val_loss": 2.2953522205352783,
+            "val_acc1": 14.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 20,
+            "val_loss": 2.3225772380828857,
+            "val_acc1": 10.0,
+            "val_acc5": 49.0
+        },
+        {
+            "batch": 21,
+            "val_loss": 2.3371047973632812,
+            "val_acc1": 6.0,
+            "val_acc5": 46.0
+        },
+        {
+            "batch": 22,
+            "val_loss": 2.2884583473205566,
+            "val_acc1": 16.0,
+            "val_acc5": 60.0
+        },
+        {
+            "batch": 23,
+            "val_loss": 2.3104867935180664,
+            "val_acc1": 11.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 24,
+            "val_loss": 2.3273706436157227,
+            "val_acc1": 7.0,
+            "val_acc5": 49.0
+        },
+        {
+            "batch": 25,
+            "val_loss": 2.300802230834961,
+            "val_acc1": 15.0,
+            "val_acc5": 56.0
+        },
+        {
+            "batch": 26,
+            "val_loss": 2.292771577835083,
+            "val_acc1": 9.0,
+            "val_acc5": 63.0
+        },
+        {
+            "batch": 27,
+            "val_loss": 2.323826313018799,
+            "val_acc1": 3.0,
+            "val_acc5": 47.0
+        },
+        {
+            "batch": 28,
+            "val_loss": 2.3117151260375977,
+            "val_acc1": 11.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 29,
+            "val_loss": 2.3259129524230957,
+            "val_acc1": 11.0,
+            "val_acc5": 46.0
+        },
+        {
+            "batch": 30,
+            "val_loss": 2.2879395484924316,
+            "val_acc1": 11.0,
+            "val_acc5": 59.0
+        },
+        {
+            "batch": 31,
+            "val_loss": 2.3248016834259033,
+            "val_acc1": 6.0,
+            "val_acc5": 43.0
+        },
+        {
+            "batch": 32,
+            "val_loss": 2.287153720855713,
+            "val_acc1": 18.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 33,
+            "val_loss": 2.312363386154175,
+            "val_acc1": 11.0,
+            "val_acc5": 46.0
+        },
+        {
+            "batch": 34,
+            "val_loss": 2.3006789684295654,
+            "val_acc1": 12.0,
+            "val_acc5": 53.0
+        },
+        {
+            "batch": 35,
+            "val_loss": 2.3247876167297363,
+            "val_acc1": 7.0,
+            "val_acc5": 53.0
+        },
+        {
+            "batch": 36,
+            "val_loss": 2.3192479610443115,
+            "val_acc1": 9.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 37,
+            "val_loss": 2.302799940109253,
+            "val_acc1": 11.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 38,
+            "val_loss": 2.3269128799438477,
+            "val_acc1": 11.0,
+            "val_acc5": 47.0
+        },
+        {
+            "batch": 39,
+            "val_loss": 2.299584150314331,
+            "val_acc1": 13.0,
+            "val_acc5": 50.0
+        },
+        {
+            "batch": 40,
+            "val_loss": 2.3034114837646484,
+            "val_acc1": 14.0,
+            "val_acc5": 52.0
+        },
+        {
+            "batch": 41,
+            "val_loss": 2.3155417442321777,
+            "val_acc1": 6.0,
+            "val_acc5": 46.0
+        },
+        {
+            "batch": 42,
+            "val_loss": 2.3144538402557373,
+            "val_acc1": 4.0,
+            "val_acc5": 52.0
+        },
+        {
+            "batch": 43,
+            "val_loss": 2.303755760192871,
+            "val_acc1": 12.0,
+            "val_acc5": 56.0
+        },
+        {
+            "batch": 44,
+            "val_loss": 2.3057942390441895,
+            "val_acc1": 10.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 45,
+            "val_loss": 2.2936835289001465,
+            "val_acc1": 10.0,
+            "val_acc5": 56.0
+        },
+        {
+            "batch": 46,
+            "val_loss": 2.2951643466949463,
+            "val_acc1": 13.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 47,
+            "val_loss": 2.3339409828186035,
+            "val_acc1": 5.0,
+            "val_acc5": 43.0
+        },
+        {
+            "batch": 48,
+            "val_loss": 2.3219709396362305,
+            "val_acc1": 17.0,
+            "val_acc5": 49.0
+        },
+        {
+            "batch": 49,
+            "val_loss": 2.319680690765381,
+            "val_acc1": 11.0,
+            "val_acc5": 44.0
+        },
+        {
+            "batch": 50,
+            "val_loss": 2.3355321884155273,
+            "val_acc1": 10.0,
+            "val_acc5": 36.0
+        },
+        {
+            "batch": 51,
+            "val_loss": 2.318075180053711,
+            "val_acc1": 10.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 52,
+            "val_loss": 2.3306167125701904,
+            "val_acc1": 12.0,
+            "val_acc5": 47.0
+        },
+        {
+            "batch": 53,
+            "val_loss": 2.3051869869232178,
+            "val_acc1": 5.0,
+            "val_acc5": 53.0
+        },
+        {
+            "batch": 54,
+            "val_loss": 2.3080644607543945,
+            "val_acc1": 10.0,
+            "val_acc5": 44.0
+        },
+        {
+            "batch": 55,
+            "val_loss": 2.3385345935821533,
+            "val_acc1": 11.0,
+            "val_acc5": 42.0
+        },
+        {
+            "batch": 56,
+            "val_loss": 2.336591958999634,
+            "val_acc1": 8.0,
+            "val_acc5": 42.0
+        },
+        {
+            "batch": 57,
+            "val_loss": 2.3409206867218018,
+            "val_acc1": 4.0,
+            "val_acc5": 42.0
+        },
+        {
+            "batch": 58,
+            "val_loss": 2.3204197883605957,
+            "val_acc1": 8.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 59,
+            "val_loss": 2.3352930545806885,
+            "val_acc1": 6.0,
+            "val_acc5": 45.0
+        },
+        {
+            "batch": 60,
+            "val_loss": 2.298755407333374,
+            "val_acc1": 18.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 61,
+            "val_loss": 2.3250041007995605,
+            "val_acc1": 4.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 62,
+            "val_loss": 2.296093702316284,
+            "val_acc1": 16.0,
+            "val_acc5": 53.0
+        },
+        {
+            "batch": 63,
+            "val_loss": 2.3192670345306396,
+            "val_acc1": 9.0,
+            "val_acc5": 50.0
+        },
+        {
+            "batch": 64,
+            "val_loss": 2.3033287525177,
+            "val_acc1": 8.0,
+            "val_acc5": 50.0
+        },
+        {
+            "batch": 65,
+            "val_loss": 2.2843799591064453,
+            "val_acc1": 6.0,
+            "val_acc5": 58.0
+        },
+        {
+            "batch": 66,
+            "val_loss": 2.3428847789764404,
+            "val_acc1": 9.0,
+            "val_acc5": 46.0
+        },
+        {
+            "batch": 67,
+            "val_loss": 2.3161754608154297,
+            "val_acc1": 7.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 68,
+            "val_loss": 2.2984843254089355,
+            "val_acc1": 8.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 69,
+            "val_loss": 2.3225481510162354,
+            "val_acc1": 12.0,
+            "val_acc5": 47.0
+        },
+        {
+            "batch": 70,
+            "val_loss": 2.320761203765869,
+            "val_acc1": 9.0,
+            "val_acc5": 50.0
+        },
+        {
+            "batch": 71,
+            "val_loss": 2.299802303314209,
+            "val_acc1": 9.0,
+            "val_acc5": 52.0
+        },
+        {
+            "batch": 72,
+            "val_loss": 2.3320140838623047,
+            "val_acc1": 8.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 73,
+            "val_loss": 2.324036121368408,
+            "val_acc1": 7.0,
+            "val_acc5": 43.0
+        },
+        {
+            "batch": 74,
+            "val_loss": 2.344294786453247,
+            "val_acc1": 4.0,
+            "val_acc5": 44.0
+        },
+        {
+            "batch": 75,
+            "val_loss": 2.307818651199341,
+            "val_acc1": 12.0,
+            "val_acc5": 49.0
+        },
+        {
+            "batch": 76,
+            "val_loss": 2.3019745349884033,
+            "val_acc1": 13.0,
+            "val_acc5": 53.0
+        },
+        {
+            "batch": 77,
+            "val_loss": 2.2970268726348877,
+            "val_acc1": 14.0,
+            "val_acc5": 58.0
+        },
+        {
+            "batch": 78,
+            "val_loss": 2.315621852874756,
+            "val_acc1": 10.0,
+            "val_acc5": 49.0
+        },
+        {
+            "batch": 79,
+            "val_loss": 2.310887098312378,
+            "val_acc1": 9.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 80,
+            "val_loss": 2.3160200119018555,
+            "val_acc1": 12.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 81,
+            "val_loss": 2.29763126373291,
+            "val_acc1": 12.0,
+            "val_acc5": 52.0
+        },
+        {
+            "batch": 82,
+            "val_loss": 2.31996750831604,
+            "val_acc1": 9.0,
+            "val_acc5": 46.0
+        },
+        {
+            "batch": 83,
+            "val_loss": 2.3162271976470947,
+            "val_acc1": 8.0,
+            "val_acc5": 42.0
+        },
+        {
+            "batch": 84,
+            "val_loss": 2.3263235092163086,
+            "val_acc1": 8.0,
+            "val_acc5": 43.0
+        },
+        {
+            "batch": 85,
+            "val_loss": 2.3131840229034424,
+            "val_acc1": 12.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 86,
+            "val_loss": 2.325528383255005,
+            "val_acc1": 7.0,
+            "val_acc5": 40.0
+        },
+        {
+            "batch": 87,
+            "val_loss": 2.323624610900879,
+            "val_acc1": 7.0,
+            "val_acc5": 43.0
+        },
+        {
+            "batch": 88,
+            "val_loss": 2.332345724105835,
+            "val_acc1": 9.0,
+            "val_acc5": 46.0
+        },
+        {
+            "batch": 89,
+            "val_loss": 2.293820858001709,
+            "val_acc1": 9.0,
+            "val_acc5": 60.0
+        },
+        {
+            "batch": 90,
+            "val_loss": 2.302276372909546,
+            "val_acc1": 15.0,
+            "val_acc5": 56.0
+        },
+        {
+            "batch": 91,
+            "val_loss": 2.2933170795440674,
+            "val_acc1": 12.0,
+            "val_acc5": 61.0
+        },
+        {
+            "batch": 92,
+            "val_loss": 2.304182529449463,
+            "val_acc1": 10.0,
+            "val_acc5": 53.0
+        },
+        {
+            "batch": 93,
+            "val_loss": 2.287536382675171,
+            "val_acc1": 16.0,
+            "val_acc5": 47.0
+        },
+        {
+            "batch": 94,
+            "val_loss": 2.329655647277832,
+            "val_acc1": 13.0,
+            "val_acc5": 42.0
+        },
+        {
+            "batch": 95,
+            "val_loss": 2.308215856552124,
+            "val_acc1": 9.0,
+            "val_acc5": 50.0
+        },
+        {
+            "batch": 96,
+            "val_loss": 2.317432403564453,
+            "val_acc1": 15.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 97,
+            "val_loss": 2.3269808292388916,
+            "val_acc1": 9.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 98,
+            "val_loss": 2.297142505645752,
+            "val_acc1": 15.0,
+            "val_acc5": 57.0
+        },
+        {
+            "batch": 99,
+            "val_loss": 2.3053016662597656,
+            "val_acc1": 10.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 100,
+            "val_loss": 2.3026421070098877,
+            "val_acc1": 4.0,
+            "val_acc5": 51.0
+        }
+    ]
+}{
+    "validation": [
+        {
+            "batch": 1,
+            "val_loss": 2.314682722091675,
+            "val_acc1": 11.0,
+            "val_acc5": 49.0
+        },
+        {
+            "batch": 2,
+            "val_loss": 2.304063320159912,
+            "val_acc1": 10.0,
+            "val_acc5": 56.0
+        },
+        {
+            "batch": 3,
+            "val_loss": 2.296337842941284,
+            "val_acc1": 14.0,
+            "val_acc5": 53.0
+        },
+        {
+            "batch": 4,
+            "val_loss": 2.319030523300171,
+            "val_acc1": 10.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 5,
+            "val_loss": 2.30329966545105,
+            "val_acc1": 11.0,
+            "val_acc5": 52.0
+        },
+        {
+            "batch": 6,
+            "val_loss": 2.330772876739502,
+            "val_acc1": 15.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 7,
+            "val_loss": 2.3197877407073975,
+            "val_acc1": 12.0,
+            "val_acc5": 46.0
+        },
+        {
+            "batch": 8,
+            "val_loss": 2.3050217628479004,
+            "val_acc1": 9.0,
+            "val_acc5": 53.0
+        },
+        {
+            "batch": 9,
+            "val_loss": 2.299654245376587,
+            "val_acc1": 5.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 10,
+            "val_loss": 2.300182819366455,
+            "val_acc1": 12.0,
+            "val_acc5": 52.0
+        },
+        {
+            "batch": 11,
+            "val_loss": 2.3406903743743896,
+            "val_acc1": 6.0,
+            "val_acc5": 44.0
+        },
+        {
+            "batch": 12,
+            "val_loss": 2.304450273513794,
+            "val_acc1": 9.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 13,
+            "val_loss": 2.291748285293579,
+            "val_acc1": 12.0,
+            "val_acc5": 55.0
+        },
+        {
+            "batch": 14,
+            "val_loss": 2.319882392883301,
+            "val_acc1": 11.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 15,
+            "val_loss": 2.304657220840454,
+            "val_acc1": 10.0,
+            "val_acc5": 47.0
+        },
+        {
+            "batch": 16,
+            "val_loss": 2.340069055557251,
+            "val_acc1": 2.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 17,
+            "val_loss": 2.306338310241699,
+            "val_acc1": 14.0,
+            "val_acc5": 52.0
+        },
+        {
+            "batch": 18,
+            "val_loss": 2.317195177078247,
+            "val_acc1": 6.0,
+            "val_acc5": 52.0
+        },
+        {
+            "batch": 19,
+            "val_loss": 2.2953522205352783,
+            "val_acc1": 14.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 20,
+            "val_loss": 2.3225772380828857,
+            "val_acc1": 10.0,
+            "val_acc5": 49.0
+        },
+        {
+            "batch": 21,
+            "val_loss": 2.3371047973632812,
+            "val_acc1": 6.0,
+            "val_acc5": 46.0
+        },
+        {
+            "batch": 22,
+            "val_loss": 2.2884583473205566,
+            "val_acc1": 16.0,
+            "val_acc5": 60.0
+        },
+        {
+            "batch": 23,
+            "val_loss": 2.3104867935180664,
+            "val_acc1": 11.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 24,
+            "val_loss": 2.3273706436157227,
+            "val_acc1": 7.0,
+            "val_acc5": 49.0
+        },
+        {
+            "batch": 25,
+            "val_loss": 2.300802230834961,
+            "val_acc1": 15.0,
+            "val_acc5": 56.0
+        },
+        {
+            "batch": 26,
+            "val_loss": 2.292771577835083,
+            "val_acc1": 9.0,
+            "val_acc5": 63.0
+        },
+        {
+            "batch": 27,
+            "val_loss": 2.323826313018799,
+            "val_acc1": 3.0,
+            "val_acc5": 47.0
+        },
+        {
+            "batch": 28,
+            "val_loss": 2.3117151260375977,
+            "val_acc1": 11.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 29,
+            "val_loss": 2.3259129524230957,
+            "val_acc1": 11.0,
+            "val_acc5": 46.0
+        },
+        {
+            "batch": 30,
+            "val_loss": 2.2879395484924316,
+            "val_acc1": 11.0,
+            "val_acc5": 59.0
+        },
+        {
+            "batch": 31,
+            "val_loss": 2.3248016834259033,
+            "val_acc1": 6.0,
+            "val_acc5": 43.0
+        },
+        {
+            "batch": 32,
+            "val_loss": 2.287153720855713,
+            "val_acc1": 18.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 33,
+            "val_loss": 2.312363386154175,
+            "val_acc1": 11.0,
+            "val_acc5": 46.0
+        },
+        {
+            "batch": 34,
+            "val_loss": 2.3006789684295654,
+            "val_acc1": 12.0,
+            "val_acc5": 53.0
+        },
+        {
+            "batch": 35,
+            "val_loss": 2.3247876167297363,
+            "val_acc1": 7.0,
+            "val_acc5": 53.0
+        },
+        {
+            "batch": 36,
+            "val_loss": 2.3192479610443115,
+            "val_acc1": 9.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 37,
+            "val_loss": 2.302799940109253,
+            "val_acc1": 11.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 38,
+            "val_loss": 2.3269128799438477,
+            "val_acc1": 11.0,
+            "val_acc5": 47.0
+        },
+        {
+            "batch": 39,
+            "val_loss": 2.299584150314331,
+            "val_acc1": 13.0,
+            "val_acc5": 50.0
+        },
+        {
+            "batch": 40,
+            "val_loss": 2.3034114837646484,
+            "val_acc1": 14.0,
+            "val_acc5": 52.0
+        },
+        {
+            "batch": 41,
+            "val_loss": 2.3155417442321777,
+            "val_acc1": 6.0,
+            "val_acc5": 46.0
+        },
+        {
+            "batch": 42,
+            "val_loss": 2.3144538402557373,
+            "val_acc1": 4.0,
+            "val_acc5": 52.0
+        },
+        {
+            "batch": 43,
+            "val_loss": 2.303755760192871,
+            "val_acc1": 12.0,
+            "val_acc5": 56.0
+        },
+        {
+            "batch": 44,
+            "val_loss": 2.3057942390441895,
+            "val_acc1": 10.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 45,
+            "val_loss": 2.2936835289001465,
+            "val_acc1": 10.0,
+            "val_acc5": 56.0
+        },
+        {
+            "batch": 46,
+            "val_loss": 2.2951643466949463,
+            "val_acc1": 13.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 47,
+            "val_loss": 2.3339409828186035,
+            "val_acc1": 5.0,
+            "val_acc5": 43.0
+        },
+        {
+            "batch": 48,
+            "val_loss": 2.3219709396362305,
+            "val_acc1": 17.0,
+            "val_acc5": 49.0
+        },
+        {
+            "batch": 49,
+            "val_loss": 2.319680690765381,
+            "val_acc1": 11.0,
+            "val_acc5": 44.0
+        },
+        {
+            "batch": 50,
+            "val_loss": 2.3355321884155273,
+            "val_acc1": 10.0,
+            "val_acc5": 36.0
+        },
+        {
+            "batch": 51,
+            "val_loss": 2.318075180053711,
+            "val_acc1": 10.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 52,
+            "val_loss": 2.3306167125701904,
+            "val_acc1": 12.0,
+            "val_acc5": 47.0
+        },
+        {
+            "batch": 53,
+            "val_loss": 2.3051869869232178,
+            "val_acc1": 5.0,
+            "val_acc5": 53.0
+        },
+        {
+            "batch": 54,
+            "val_loss": 2.3080644607543945,
+            "val_acc1": 10.0,
+            "val_acc5": 44.0
+        },
+        {
+            "batch": 55,
+            "val_loss": 2.3385345935821533,
+            "val_acc1": 11.0,
+            "val_acc5": 42.0
+        },
+        {
+            "batch": 56,
+            "val_loss": 2.336591958999634,
+            "val_acc1": 8.0,
+            "val_acc5": 42.0
+        },
+        {
+            "batch": 57,
+            "val_loss": 2.3409206867218018,
+            "val_acc1": 4.0,
+            "val_acc5": 42.0
+        },
+        {
+            "batch": 58,
+            "val_loss": 2.3204197883605957,
+            "val_acc1": 8.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 59,
+            "val_loss": 2.3352930545806885,
+            "val_acc1": 6.0,
+            "val_acc5": 45.0
+        },
+        {
+            "batch": 60,
+            "val_loss": 2.298755407333374,
+            "val_acc1": 18.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 61,
+            "val_loss": 2.3250041007995605,
+            "val_acc1": 4.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 62,
+            "val_loss": 2.296093702316284,
+            "val_acc1": 16.0,
+            "val_acc5": 53.0
+        },
+        {
+            "batch": 63,
+            "val_loss": 2.3192670345306396,
+            "val_acc1": 9.0,
+            "val_acc5": 50.0
+        },
+        {
+            "batch": 64,
+            "val_loss": 2.3033287525177,
+            "val_acc1": 8.0,
+            "val_acc5": 50.0
+        },
+        {
+            "batch": 65,
+            "val_loss": 2.2843799591064453,
+            "val_acc1": 6.0,
+            "val_acc5": 58.0
+        },
+        {
+            "batch": 66,
+            "val_loss": 2.3428847789764404,
+            "val_acc1": 9.0,
+            "val_acc5": 46.0
+        },
+        {
+            "batch": 67,
+            "val_loss": 2.3161754608154297,
+            "val_acc1": 7.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 68,
+            "val_loss": 2.2984843254089355,
+            "val_acc1": 8.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 69,
+            "val_loss": 2.3225481510162354,
+            "val_acc1": 12.0,
+            "val_acc5": 47.0
+        },
+        {
+            "batch": 70,
+            "val_loss": 2.320761203765869,
+            "val_acc1": 9.0,
+            "val_acc5": 50.0
+        },
+        {
+            "batch": 71,
+            "val_loss": 2.299802303314209,
+            "val_acc1": 9.0,
+            "val_acc5": 52.0
+        },
+        {
+            "batch": 72,
+            "val_loss": 2.3320140838623047,
+            "val_acc1": 8.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 73,
+            "val_loss": 2.324036121368408,
+            "val_acc1": 7.0,
+            "val_acc5": 43.0
+        },
+        {
+            "batch": 74,
+            "val_loss": 2.344294786453247,
+            "val_acc1": 4.0,
+            "val_acc5": 44.0
+        },
+        {
+            "batch": 75,
+            "val_loss": 2.307818651199341,
+            "val_acc1": 12.0,
+            "val_acc5": 49.0
+        },
+        {
+            "batch": 76,
+            "val_loss": 2.3019745349884033,
+            "val_acc1": 13.0,
+            "val_acc5": 53.0
+        },
+        {
+            "batch": 77,
+            "val_loss": 2.2970268726348877,
+            "val_acc1": 14.0,
+            "val_acc5": 58.0
+        },
+        {
+            "batch": 78,
+            "val_loss": 2.315621852874756,
+            "val_acc1": 10.0,
+            "val_acc5": 49.0
+        },
+        {
+            "batch": 79,
+            "val_loss": 2.310887098312378,
+            "val_acc1": 9.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 80,
+            "val_loss": 2.3160200119018555,
+            "val_acc1": 12.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 81,
+            "val_loss": 2.29763126373291,
+            "val_acc1": 12.0,
+            "val_acc5": 52.0
+        },
+        {
+            "batch": 82,
+            "val_loss": 2.31996750831604,
+            "val_acc1": 9.0,
+            "val_acc5": 46.0
+        },
+        {
+            "batch": 83,
+            "val_loss": 2.3162271976470947,
+            "val_acc1": 8.0,
+            "val_acc5": 42.0
+        },
+        {
+            "batch": 84,
+            "val_loss": 2.3263235092163086,
+            "val_acc1": 8.0,
+            "val_acc5": 43.0
+        },
+        {
+            "batch": 85,
+            "val_loss": 2.3131840229034424,
+            "val_acc1": 12.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 86,
+            "val_loss": 2.325528383255005,
+            "val_acc1": 7.0,
+            "val_acc5": 40.0
+        },
+        {
+            "batch": 87,
+            "val_loss": 2.323624610900879,
+            "val_acc1": 7.0,
+            "val_acc5": 43.0
+        },
+        {
+            "batch": 88,
+            "val_loss": 2.332345724105835,
+            "val_acc1": 9.0,
+            "val_acc5": 46.0
+        },
+        {
+            "batch": 89,
+            "val_loss": 2.293820858001709,
+            "val_acc1": 9.0,
+            "val_acc5": 60.0
+        },
+        {
+            "batch": 90,
+            "val_loss": 2.302276372909546,
+            "val_acc1": 15.0,
+            "val_acc5": 56.0
+        },
+        {
+            "batch": 91,
+            "val_loss": 2.2933170795440674,
+            "val_acc1": 12.0,
+            "val_acc5": 61.0
+        },
+        {
+            "batch": 92,
+            "val_loss": 2.304182529449463,
+            "val_acc1": 10.0,
+            "val_acc5": 53.0
+        },
+        {
+            "batch": 93,
+            "val_loss": 2.287536382675171,
+            "val_acc1": 16.0,
+            "val_acc5": 47.0
+        },
+        {
+            "batch": 94,
+            "val_loss": 2.329655647277832,
+            "val_acc1": 13.0,
+            "val_acc5": 42.0
+        },
+        {
+            "batch": 95,
+            "val_loss": 2.308215856552124,
+            "val_acc1": 9.0,
+            "val_acc5": 50.0
+        },
+        {
+            "batch": 96,
+            "val_loss": 2.317432403564453,
+            "val_acc1": 15.0,
+            "val_acc5": 51.0
+        },
+        {
+            "batch": 97,
+            "val_loss": 2.3269808292388916,
+            "val_acc1": 9.0,
+            "val_acc5": 48.0
+        },
+        {
+            "batch": 98,
+            "val_loss": 2.297142505645752,
+            "val_acc1": 15.0,
+            "val_acc5": 57.0
+        },
+        {
+            "batch": 99,
+            "val_loss": 2.3053016662597656,
+            "val_acc1": 10.0,
+            "val_acc5": 54.0
+        },
+        {
+            "batch": 100,
+            "val_loss": 2.3026421070098877,
+            "val_acc1": 4.0,
+            "val_acc5": 51.0
+        }
+    ]
+}

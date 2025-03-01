@@ -1,0 +1,15 @@
+artifact_uri: file:///C://Users/hueda/Documents/Model_robust_weight_perturbation/RobustQuantization/nn_quantization_pytorch/nn-quantization-pytorch/quantization/mxt-sim/mllog_runs/547556994326624946/d5100ed9c8bd4114901ce13b5fbe7678/artifacts
+end_time: 1733166153208
+entry_point_name: ''
+experiment_id: '547556994326624946'
+lifecycle_stage: active
+run_id: d5100ed9c8bd4114901ce13b5fbe7678
+run_name: mlp_cifar10_cifar10_W8A8
+run_uuid: d5100ed9c8bd4114901ce13b5fbe7678
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1733166153156
+status: 3
+tags: []
+user_id: hueda
