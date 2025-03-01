@@ -16,8 +16,9 @@ quantization/datasets/*
 quantization/quantization_results/*
 quantization/extracted_params/*
 quantization/scalars/*
-RobustQuantization/nn_quantization_pytorch/nn-quantization-pytorch/quantization/qat/mxt-sim/*
-RobustQuantization/nn_quantization_pytorch/nn-quantization-pytorch/quantization/qat/pretrain/*
+Robust-quantization-ref/nn_quantization_pytorch/nn-quantization-pytorch/quantization/qat/mxt-sim/*
+Robust-quantization-ref/nn_quantization_pytorch/nn-quantization-pytorch/quantization/qat/pretrain/*
+RobustQuantization/*
 
 
 
