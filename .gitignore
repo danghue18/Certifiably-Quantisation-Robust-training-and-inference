@@ -8,8 +8,8 @@ interval_bound_propagation/checkpoint/SVHN/*.pth
 Paper/*
 verification/datasets/*
 verification/extracted_params/*
-verification/opt_result/*.xlsx
-verification/opt_result/*.npy
+verification/opt_results/*.xlsx
+verification/opt_results/*.npy
 Hue's rebuttal (AIStats25).md
 /*.png
 quantization/datasets/*
