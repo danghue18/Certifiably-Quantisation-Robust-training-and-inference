@@ -2,12 +2,12 @@
 We tackle the problem of computing guarantees for the robustness of neural networks against quantisation of their inputs, parameters and activation values. In particular, we pose the problem of bounding the worst-case discrepancy between the original neural network and all possible quantised ones parametrised by a given maximum quantisation diameter $\epsilon > 0$ over a finite dataset. To achieve this, we first reformulate the problem  in terms of bilinear optimisation, which can be solved for provable bounds on the robustness guarantee. We then show how a quick scheme based on interval bound propagation can be developed and implemented during training so to allow for the learning of neural networks robust against a continuous family of quantisation techniques. 
 
 ## 1. How to Run the Program computing the worst-case discrepancy using bilinear optimization 
-The below instruction is compute the worst-case discrepancy between the original neural network and all possible quantized one over a finite test dataset by reformulating the problem in terms of bilinear optimization and use the Gurobi solver to solve it. Currently, we are experimenting with this method on 16 different models across 50 images from the MNIST test set.
+The below instruction is compute the worst-case discrepancy between the original neural network and all possible quantized ones over a finite test dataset by reformulating the problem in terms of bilinear optimization and using the Gurobi solver to solve it. Currently, we are experimenting with this method on 16 different models across 50 images from the MNIST test set.
  
 Follow the steps below to run the experiments:
 
 ### Step 1: Add Gurobi License
-1. Download a Gurobi license (we currentlu use an academic license https://www.gurobi.com/academia/academic-program-and-licenses/), rename as 'gurobi.lic" to your root directory (examples for Windows: C:\Users\hueda\gurobi.lic) becuase this is the default directory where Gurobi will search for the license.
+1. Download a Gurobi license (we currently use an academic license https://www.gurobi.com/academia/academic-program-and-licenses/), rename as 'gurobi.lic" to your root directory (examples for Windows: C:\Users\hueda\gurobi.lic) because this is the default directory where Gurobi will search for the license.
 
 ### Step 2: Navigate to the Verification Folder
 1. Move to the verification directory:
